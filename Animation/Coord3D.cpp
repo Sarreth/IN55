@@ -129,21 +129,10 @@ Coord3D Coord3D::crossProduct(const Coord3D & vect)const //produit vectoriel
 
 float Coord3D::distanceDroiteAuPoint(const Coord3D & pointDeLaDroite, const Coord3D & point)const //calcul la distance entre la droite (defini par un vecteur directeur et un pointDeLaDroite) et le point
 {
-        float distance;
+        Coord3D prod = crossProduct(Coord3D(pointDeLaDroite, point));
+        prod = prod-prod*2;
 
-        float tailleVect;
-        float tailleVectDirecteur; //le vect directeur etant 'this'
-
-        Coord3D vectDeuxPoints(pointDeLaDroite, point);
-        Coord3D prod;
-
-        prod = this->crossProduct(vectDeuxPoints);
-        prod = prod-prod*2; //on inverse le produit vectoriel
-        tailleVect = prod.length();
-        tailleVectDirecteur = this->length();
-        distance = tailleVect/tailleVectDirecteur;
-
-        return distance;
+        return prod.length()/length();
 }
 
 float Coord3D::length()const
