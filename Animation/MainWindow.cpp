@@ -189,7 +189,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     QDesktopWidget widget;
     mainScreenSize = widget.availableGeometry(widget.primaryScreen());
 
-    qDebug() << mainScreenSize.width() << " et " << mainScreenSize.height();
+    qDebug() << "+ Resolution de l'écran : " << mainScreenSize.width() << "x" << mainScreenSize.height();
     vuePrincipal = new OpenGLWidget (this, joueur, positionCamera, cibleCamera, _tailleTerrainX, _tailleTerrainY, liste_objets, nombreObjets, 0, "Vue Principale");
 
     setCentralWidget(vuePrincipal);
