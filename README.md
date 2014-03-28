@@ -30,3 +30,6 @@ http://jeux.developpez.com/tutoriels/?page=prog-3d#qt-3d
 
 http://codes-sources.commentcamarche.net/source/53393-base-moteur-3d-en-qt-opengl-complet-et-fonctionnel-pour-un-tres-prochain-jeu-3d
 (projet ultra complet qui sera sûrement reutilisable)
+
+http://codes-sources.commentcamarche.net/source/28264-jeu-3d-opengl
+(projet jeu vidéo 3D avec des personnages animés)
