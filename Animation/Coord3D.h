@@ -29,7 +29,6 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 
-
 #include <QtOpenGL/QGLWidget>
 #include <GL/gl.h>
 #include <GL/glu.h>
