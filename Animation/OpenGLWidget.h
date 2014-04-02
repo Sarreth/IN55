@@ -21,13 +21,9 @@
 class OpenGLWidget : public QGLWidget
 {
         //Q_OBJECT
-
         public:
-                OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera, int taillSolX, int tailleSolY, Objet *listeObjet[], int nombreObjets, int typeCamera, QString nomDeClasse = "" );
-                OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, int typeCamera, QString nomDeClasse);
-
-                void setVueIsActive(bool active); //si on desactive la minicarte avec le menu
-        private:
+                OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera, int taillSolX, int tailleSolY, Objet *listeObjet[], int nombreObjets, QString nomDeClasse = "" );
+                OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse);
                 void initializeGL(); //initialisation des paramtres opengl, du fog, des textures,...
                 void resizeGL ( int width, int height ); //est appele quand on cree le widget
                 void paintGL(); //appelle apres lors des updateGL (quand on veut rafraichir)
@@ -38,7 +34,6 @@ class OpenGLWidget : public QGLWidget
 
                 bool _vueActive;
 
-                int _typeDeCamera;
                 Coord3D _positionCamera;
                 Coord3D _cibleCamera;
                 float _theta;

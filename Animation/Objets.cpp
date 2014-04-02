@@ -31,12 +31,11 @@ Objet::Objet(bool visible, Coord3D position, Coord3D orientation, bool possedeCo
     _orientation = orientation;
     _possedeCollisionBox = possedeCollisionBox;
     _collisionBox = collisionBox;
-    _rotation90degCollisionBox = rotation90degCollisionBox;
 
     ////////////////////////////////////////////////////////
     //Rotation de la bound box avec la rotation de l'objet//
     ////////////////////////////////////////////////////////
-    if (_rotation90degCollisionBox==true)
+    if ((_rotation90degCollisionBox = rotation90degCollisionBox))
     {
         tampon = _collisionBox.X;
         _collisionBox.X = _collisionBox.Y;
@@ -68,7 +67,7 @@ void Objet::loadMesh()
 {
     QFile file(_fichierMesh);
 
-    if (file.open(QIODevice::ReadOnly) == false) //si il y a une erreur a l'ouverture
+    if (!file.open(QIODevice::ReadOnly)) //si il y a une erreur a l'ouverture
         _chargementMeshOk = false;
     else //si il a reussi a le lire
     {
@@ -83,7 +82,6 @@ void Objet::loadMesh()
         while(!fichier.atEnd())
         {
             QString line = fichier.readLine();
-            //qDebug() << line;
             QStringList listeCellules = line.split((' '));
             if (listeCellules[0] == "v")
                 _nombreDeVectrices++;
@@ -221,16 +219,17 @@ void Objet::loadMesh()
 
 void Objet::loadTexture()
 {
-    _chargementTextureOk = _imageBase.load ( _fichierTexture, "PNG" ); //chargement du fichier image, etatChargement contient true si cest chargÃ©
-    if (_chargementTextureOk == false) //si erreur de chargement, affichage erreur
-        {
-        qDebug() << "----->ERREUR 02 ; Chargement texture " << _nomObjet << " = FAILED";
-        }
-    else //si l'image est chargee on continue...
-        {
+    if(_imageBase.load ( _fichierTexture, "PNG" ))//chargement fichier image
+    {
+        _chargementTextureOk=true;
         _imageTextureQT = QGLWidget::convertToGLFormat ( _imageBase ); //transformation et renversement de l'image
         qDebug() << "+ Chargement texture objet " << _nomObjet << " : OK";
-        }
+    }else//si erreur
+    {
+        qDebug() << "----->ERREUR 02 ; Chargement texture " << _nomObjet << " = FAILED";
+        _chargementTextureOk=false;
+    }
+
 }
 
 
@@ -240,20 +239,6 @@ void Objet::afficherObjet()
     if ((_chargementMeshOk) && (_chargementTextureOk) && (_isVisible))
     {
         glPushMatrix();
-        /*
-        if (_isDead==true) //si l'objet à été touché, on le rend transparent
-        {
-            glEnable(GL_BLEND);		// Turn Blending On
-            glColor4f(1.0f,1.0f,1.0f,0.5f);			// Full brightness, 50% Alpha
-            glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-            //glEnable(GL_COLOR_MATERIAL); //activation coloration (si on veut le mettre en rouge par exemple...)
-            glTranslated ( 0, 0, -_etapeDeath );
-            _etapeDeath+=0.01;//pour la vitesse d'enfoncement initiale
-            _etapeDeath*=1.05;//pour l'acceleration
-            if (_etapeDeath>30)
-                _isVisible = false;
-        }*/
-
         glTranslated ( _position.X,_position.Y,_position.Z );
 
         if (_orientation.X != 0)
@@ -279,15 +264,15 @@ void Objet::afficherObjet()
                     }
                     else //si cest des triangles sans uv map
                     {
-                    glTexCoord2d ( 0       , 0       );  glVertex3f ( (_tableauMesh)[f][0][0],(_tableauMesh)[f][0][1],(_tableauMesh)[f][0][2]);
-                    glTexCoord2d ( _repeatx, 0       );  glVertex3f ( (_tableauMesh)[f][1][0],(_tableauMesh)[f][1][1],(_tableauMesh)[f][1][2]);
-                    glTexCoord2d ( _repeatx, _repeaty);  glVertex3f ( (_tableauMesh)[f][2][0],(_tableauMesh)[f][2][1],(_tableauMesh)[f][2][2]);
+                        glTexCoord2d ( 0       , 0       );  glVertex3f ( (_tableauMesh)[f][0][0],(_tableauMesh)[f][0][1],(_tableauMesh)[f][0][2]);
+                        glTexCoord2d ( _repeatx, 0       );  glVertex3f ( (_tableauMesh)[f][1][0],(_tableauMesh)[f][1][1],(_tableauMesh)[f][1][2]);
+                        glTexCoord2d ( _repeatx, _repeaty);  glVertex3f ( (_tableauMesh)[f][2][0],(_tableauMesh)[f][2][1],(_tableauMesh)[f][2][2]);
                     }
 
                 }
                 else if (_nombreVectricesFace[f]==4) //si il y a 4 vectrices dans la face, on  trace le rectangle avec deux triangles, pour optimiser le dessin et limiter les appel à glBegin()
                 {
-                    if (_isTextureUVMap == true)
+                    if (_isTextureUVMap)
                     {
                         glNormal3f(_tableauxNormales[f][0],_tableauxNormales[f][1],_tableauxNormales[f][2]);
                         glTexCoord2f ( _tableauTexture[f][0][0],_tableauTexture[f][0][1] );   glVertex3f ( (_tableauMesh)[f][0][0],(_tableauMesh)[f][0][1],(_tableauMesh)[f][0][2]);
@@ -329,7 +314,7 @@ void Objet::afficherObjet()
 
 void Objet::dessinerBoundBox()
 {
-    if (_possedeCollisionBox == true)
+    if (_possedeCollisionBox)
     {
         glDisable(GL_TEXTURE_2D);
 
@@ -382,7 +367,7 @@ void Objet::dessinerBoundBox()
 
 void Objet::genererTextureOpenGL(bool useMipMap)
 {
-    if (_chargementTextureOk == true)
+    if (_chargementTextureOk)
     {
     GLuint finalTexture;
 
@@ -391,45 +376,29 @@ void Objet::genererTextureOpenGL(bool useMipMap)
     glBindTexture ( GL_TEXTURE_2D, finalTexture );
 
     if ( useMipMap )
-        {
+    {
         gluBuild2DMipmaps ( GL_TEXTURE_2D, 3, _imageTextureQT.width(), _imageTextureQT.height(), GL_RGBA, GL_UNSIGNED_BYTE,
                                 _imageTextureQT.bits() );//creation des 3 mipmaps (adapte a chaque distance)
         glTexParameteri ( GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,
                               GL_LINEAR_MIPMAP_LINEAR ); //ajout du filtre trilineaire pour le "tres beau rendu"
-        }
+    }
     else
-        {
+    {
         glTexImage2D ( GL_TEXTURE_2D, 0, 4, _imageTextureQT.width(), _imageTextureQT.height(), 0, GL_RGBA,GL_UNSIGNED_BYTE,
                                 _imageTextureQT.bits() );
         glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR ); //ajout de seulement un filtre lineaire
-        }
+    }
 
     glTexParameteri ( GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR ); //filtre lineaire pour longue distance
     _textureFinaleObjet = finalTexture;
-
-
     }
 
 }
-
-
-
-void Objet::setIsVisible(bool visible)
-{
-    _isVisible = visible;
-}
-
-bool Objet::getIsVisible()
-{
-    return _isVisible;
-}
-
 
 void Objet::setPosition(Coord3D position)
 {
     _position = position;
 }
-
 
 Coord3D Objet::getPosition()
 {
@@ -441,25 +410,7 @@ Coord3D Objet::getCollisionBox()
     return _collisionBox;
 }
 
-
-int Objet::getNombreDeFaces()
-{
-        return _nombreDeFaces;
-}
-
-
-void Objet::setPossedeCollisionBox(bool possedeBox)
-{
-        _possedeCollisionBox = possedeBox;
-}
-
 bool Objet::getPossedeCollisionBox()
 {
         return _possedeCollisionBox;
-}
-
-
-QString Objet::getNom()
-{
-        return _nomObjet;
 }

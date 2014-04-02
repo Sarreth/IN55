@@ -7,12 +7,12 @@ IN55 Project - Character Animation
 TODO :
 ======
 
-- (Optionnel) Créer un modèle 3D avec un squelette / Le récupérer cas échant
-- Implanter le modèle dans la scène
-- Programmer l'animation du modèle
-- Améliorer l'environnement (décors)
-- Gérer l'aspect ratio (16:9 4:3 16:10)
-- RDV Avec le prof pour préciser les objectifs
+- (Optionnel) Creer un modele 3D avec un squelette / Le recuperer cas echant
+- Implanter le modele dans la scene
+- Programmer l'animation du modele
+- Ameliorer l'environnement (decors)
+- Gerer l'aspect ratio (16:9 4:3 16:10)
+- RDV Avec le prof pour preciser les objectifs
 
 Liens utiles :
 ==============
@@ -32,4 +32,4 @@ http://codes-sources.commentcamarche.net/source/53393-base-moteur-3d-en-qt-openg
 (projet ultra complet qui sera sûrement reutilisable)
 
 http://codes-sources.commentcamarche.net/source/28264-jeu-3d-opengl
-(projet jeu vidéo 3D avec des personnages animés)
+(projet jeu video 3D avec des personnages animes)

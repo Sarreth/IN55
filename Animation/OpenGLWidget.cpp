@@ -2,10 +2,8 @@
 
 using namespace std;
 
-OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, int typeCamera, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
+OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
 {
-    _vueActive = true;
-    _typeDeCamera = typeCamera;// va determiner si la camera est fixe ou si il faut appeler getPosition (du joueur) et getCibleCamera pour positionner la camera
     _nomDeClasse = nomDeClasse;
     p_joueur = joueur;
 
@@ -30,10 +28,8 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLi
 
 }
 
-OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, int typeCamera, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
+OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
 {
-    _vueActive = true;
-    _typeDeCamera = typeCamera;// va determiner si la camera est fixe ou si il faut appeler getPosition (du joueur) et getCibleCamera pour positionner la camera
     _nomDeClasse = nomDeClasse;
     p_joueur = joueur;
 
@@ -114,15 +110,12 @@ void OpenGLWidget::initializeGL()
 
 GLuint OpenGLWidget::loadTexture ( QString filename, bool useMipMap)
 {
-        QImage baseTexture;
-        QImage interTexture;
+        QImage baseTexture, interTexture;
         GLuint finalTexture;
 
         bool etatChargement = baseTexture.load ( filename, "PNG" ); //chargement de l'image, etatChargement contient true si cest chargÃ©
         if (etatChargement == false)
-        {
             qDebug() << "----->ERREUR 02 ; Chargement textureGun = FAILED";
-        }
 
         interTexture = QGLWidget::convertToGLFormat ( baseTexture ); //transformation et renversement de l'image
         glGenTextures ( 1, &finalTexture ); //generation de la texture openGL, Ã  ce niveau ont pourrait renvoyer finalTexture
@@ -211,10 +204,7 @@ void OpenGLWidget::ConversionVecteursVersAngles() //transforme les coordonnÃ©e
         //_theta = arcos ( X / racine(X²+Y²) )
         //-La librairie <cmath> utilise les radians! C'est pour cela qu'il faut convertir à chaque fois les degrÃ©s...
 
-        Coord3D _forward;
-        _forward.X = _targetJoueur.X - (_positionJoueur.X+1);
-        _forward.Y = _targetJoueur.Y - (_positionJoueur.Y+1);
-        _forward.Z = _targetJoueur.Z - (_positionJoueur.Z+6);
+        Coord3D _forward(_targetJoueur.X - (_positionJoueur.X+1),_targetJoueur.Y - (_positionJoueur.Y+1),_targetJoueur.Z - (_positionJoueur.Z+6));
 
         float r = sqrt(pow(_forward.X,2) + pow(_forward.Y,2) + pow(_forward.Z,2));
         _phi = ( acos(_forward.Z/r)  *180/M_PI);
@@ -242,8 +232,6 @@ void OpenGLWidget::resizeGL ( int width, int height )
 /////////////////////////////////////////////////////////////////////////////////////
 
 void OpenGLWidget::paintGL()
-{
-if (_vueActive == true)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
@@ -347,44 +335,13 @@ if (_vueActive == true)
     vector< int > tableau(_nombreObjets,0);
 
     for (int i=0 ; i < _nombreObjets ; i++)
-    {
-
             p_listeObjets[i]->afficherObjet();
-    }
+
     glDepthMask(GL_FALSE); //on desactive le z-buffer EN ECRITURE, sinon les face transparentes serait dessiné au dessus des opaques
     for (int i=0 ; i < indexObjet ; i++)
-    {
         p_listeObjets[tableau[i]]->afficherObjet();
-    }
+
     glDepthMask(GL_TRUE);
+
 }
-else
-{
-    float ambient[4] = {1.0f,1.0f,1.0f,1.0f};
-    glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,ambient);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    gluLookAt(0.4,-0.8,0.5,0.4,0,0.5,0,0,1);
-    glEnable ( GL_TEXTURE_2D );
-    glBindTexture ( GL_TEXTURE_2D, textureVueInactive );
-    glBegin ( GL_QUADS );
-        glNormal3d (-1,0,1);
-        glTexCoord2d ( 0,0 );  glVertex3d ( 0,0,0 );
-        glTexCoord2d ( 1,0 );  glVertex3d ( 1,0,0 );
-        glTexCoord2d ( 1,1 );  glVertex3d ( 1,0,1 );
-        glTexCoord2d ( 0,1 );  glVertex3d ( 0,0,1 );
-    glEnd();
-}
-}
-
-
-
-void OpenGLWidget::setVueIsActive(bool active)
-{
-    _vueActive = active;
-    updateGL();
-}
-
 

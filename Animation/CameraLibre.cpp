@@ -62,17 +62,15 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
             //debut test collision
             i=0;
             _collision = false;
-            while (i<nombreObjets && _collision==false)
+            while (i<nombreObjets && !_collision)
             {
-                if (listeObjet[i]->getPossedeCollisionBox() == true) //on verifie qu'il a une box
+                if (listeObjet[i]->getPossedeCollisionBox()) //on verifie qu'il a une box
                     _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
                 i++;
             }//Fin test collision
 
-            if (_collision == true)
-            {
+            if (_collision)
                 _position.X -= _forward.X * _vitesse;
-            }
 
 
 
@@ -80,21 +78,18 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
             //debut test collision
             i=0;
             _collision = false;
-            while (i<nombreObjets && _collision==false)
+            while (i<nombreObjets && !_collision)
             {
-                if (listeObjet[i]->getPossedeCollisionBox() == true)
+                if (listeObjet[i]->getPossedeCollisionBox())
                     _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
                 i++;
             }//Fin test collision
 
-            if (_collision == true)
-            {
+            if (_collision)
                 _position.Y -= _forward.Y * _vitesse;
-            }
 
         }
         if (Mouvement[RECULER])
-            //Ajouter test de collision pour crédibilité
         {
             _position.X -= _forward.X * _vitesse;
             _position.Y -= _forward.Y * _vitesse;
@@ -105,17 +100,15 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
                 //debut test collision
                 i=0;
                 _collision = false;
-                while (i<nombreObjets && _collision==false)
+                while (i<nombreObjets && !_collision)
                 {
-                    if (listeObjet[i]->getPossedeCollisionBox() == true) //on verifie qu'il a une box
+                    if (listeObjet[i]->getPossedeCollisionBox()) //on verifie qu'il a une box
                         _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
                     i++;
                 }//Fin test collision
 
-                if (_collision == true)
-                {
+                if (_collision)
                     _position -= _left * _vitesse;
-                }
         }
         if (Mouvement[DROITE])
         {
@@ -123,54 +116,52 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
                 //debut test collision
                 i=0;
                 _collision = false;
-                while (i<nombreObjets && _collision==false)
+                while (i<nombreObjets && !_collision)
                 {
                     if (listeObjet[i]->getPossedeCollisionBox() == true) //on verifie qu'il a une box
                         _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
                     i++;
                 }//Fin test collision
-                if (_collision == true)
-                {
+                if (_collision)
                     _position += _left * _vitesse;
-                }
         }
 
 
-        if (Mouvement[ACCROUPI] == true)
+        if (Mouvement[ACCROUPI])
         {
-            if ((joueurAccroupi == false) && (Mouvement[SAUT] == false))
-                {
+            if ((!joueurAccroupi) && (!Mouvement[SAUT]))
+            {
                 _position.Z -= 2;
                 joueurAccroupi = true;
-                }
+            }
         }
 
-        if (Mouvement[ACCROUPI] == false)
+        if (!Mouvement[ACCROUPI])
         {
-            if (joueurAccroupi == true)
-                {
+            if (joueurAccroupi)
+            {
                 _position.Z += 2;
                 joueurAccroupi = false;
-                }
+            }
         }
 
         ////////////////////////////GESTION DU SAUT////////////////////////////
 
-        if ((Mouvement[SAUT] == true) || (saut.enCollision))
+        if ((Mouvement[SAUT]) || (saut.enCollision))
         {
-            if ((Mouvement[SAUT] == true) && (saut.enCollision))
+            if ((Mouvement[SAUT]) && (saut.enCollision))
             {
                 saut.step = 0;
                 saut.enCollision = false;
             }
 
             if (saut.step == 0)
-                {
-                    saut.altitudeInitial = _position.Z;
-                    saut.altitudeVoulu = _position.Z+7 ;
-                    DeterminerConstanteSaut(saut.altitudeInitial, saut.altitudeVoulu);
-                    saut.altitude = saut.altitudeInitial;
-                }
+            {
+                saut.altitudeInitial = _position.Z;
+                saut.altitudeVoulu = _position.Z+7 ;
+                DeterminerConstanteSaut(saut.altitudeInitial, saut.altitudeVoulu);
+                saut.altitude = saut.altitudeInitial;
+            }
             saut.altitudePrecedente = _position.Z;
             saut.altitude = 0.5*saut.acceleration*(saut.step*saut.step) + saut.vitesseBase*saut.step+saut.altitudeInitial;
             _position.Z = saut.altitude;
@@ -180,15 +171,15 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
             //debut test collision
             i=0;
             _collision = false;
-            while (i<nombreObjets && _collision==false)
+            while (i<nombreObjets && !_collision)
             {
-                if (listeObjet[i]->getPossedeCollisionBox() == true) //on verifie qu'il a une box
+                if (listeObjet[i]->getPossedeCollisionBox()) //on verifie qu'il a une box
                     _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
                 i++;
             }
             //Fin test collision
 
-            if ((_collision==true)&&(saut.step>500)) //quand on a saute sur un objet
+            if ((_collision)&&(saut.step>500)) //quand on a saute sur un objet
             {
                 //qDebug() << "step = " << saut.step << " | Altitude  = " << saut.altitude ;
                 _position.Z = saut.altitudePrecedente;
@@ -198,7 +189,7 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
 
             }
             //et maintenant quand on tombe sans sauter de l'objet, on parametre un nouveau saut, mais juste la partie de la descente
-            else if ((_collision==false)&&(saut.enCollision==true)&&(_position.Z>0))
+            else if ((!_collision)&&(saut.enCollision)&&(_position.Z>0))
             {
                 saut.enCollision=false;
                 Mouvement[SAUT] = true;
@@ -238,17 +229,13 @@ bool CameraLibre::test_Collision(Coord3D positionObjet1, Coord3D boxObjet1, Coor
     || (positionObjet2.Z + boxObjet2.Z <= positionObjet1.Z))  // trop devant
         return 0;
     else //si il y a collision
-    {
         return 1;
-    }
 }
 
 void CameraLibre::ConversionAnglesVersVecteurs() //tranforme les coordonnees_phi et _theta en vecteur qui donne la direction de la camera
 {
-        _forward.Z = cos(_phi*M_PI/180);
         float r_temp = sin(_phi*M_PI/180);
-        _forward.X = r_temp*cos(_theta*M_PI/180);
-        _forward.Y = r_temp*sin(_theta*M_PI/180);
+        _forward = Coord3D(r_temp*cos(_theta*M_PI/180),r_temp*sin(_theta*M_PI/180),cos(_phi*M_PI/180));
 }
 
 void CameraLibre::ConversionVecteursVersAngles() //tranforme les coordonnees X,Y,Z en _phi et _theta
@@ -262,21 +249,15 @@ void CameraLibre::ConversionVecteursVersAngles() //tranforme les coordonnees X,Y
         //_theta = arcos ( X / racine(X²+Y²) )
         //-La librairie <cmath> utilise les radians, il faut donc convertir a chaque fois les degres
 
-        _forward.X = _cibleCamera.X - (_position.X+1);
-        _forward.Y = _cibleCamera.Y - (_position.Y+1);
-        _forward.Z = _cibleCamera.Z - (_position.Z+5); //la camera est positionnée à 5 du sol et décalé de (1,1), il faut en prendre compte pour
-                                                 //pour le calcul du vecteur forward
+    _forward = Coord3D(_cibleCamera.X - (_position.X+1),_cibleCamera.Y - (_position.Y+1),_cibleCamera.Z - (_position.Z+5));
+    float r = sqrt(pow(_forward.X,2) + pow(_forward.Y,2) + pow(_forward.Z,2));
+    _phi = ( acos(_forward.Z/r)  *180/M_PI);
 
-
-        float r = sqrt(pow(_forward.X,2) + pow(_forward.Y,2) + pow(_forward.Z,2));
-        _phi = ( acos(_forward.Z/r)  *180/M_PI);
-        //qDebug() << "r = " << r;
-
-        float r_temp = sqrt(pow(_forward.X,2) + pow(_forward.Y,2));
-        if (_forward.Y >= 0)
-                _theta = ( (acos(_forward.X/r_temp)) *180/M_PI);
+    float r_temp = sqrt(pow(_forward.X,2) + pow(_forward.Y,2));
+    if (_forward.Y >= 0)
+            _theta = ( (acos(_forward.X/r_temp)) *180/M_PI);
     else
-                _theta = - (  (acos(_forward.X/r_temp))   *180/M_PI);
+            _theta = - (  (acos(_forward.X/r_temp))   *180/M_PI);
 
 
 }
@@ -309,15 +290,15 @@ void CameraLibre::mouvementSouris (int xrel, int yrel)
         _phi -= yrel*_sensivity; //on met un '-' car quand on regarde vers le bas _phi augmente
 
         if (_phi < 10) //On limite les valeurs de _phi, pour prévenir le torticoli :D
-                _phi = 10;
+            _phi = 10;
         else if (_phi > 170)
-                _phi = 170;
+            _phi = 170;
 
 
         if (_theta > 180) //Evite d'avoir un angle de rotation lateral (theta donc) qui atteint 2700°
-                _theta = -180;
+            _theta = -180;
         else if (_theta < -180)
-                _theta = 180;
+            _theta = 180;
 
         _orientation.Z = _theta;
         ConversionAnglesVersVecteurs(); //et on convertit notre variation d'angle de vue en un vecteur (interpretable par la camera)
@@ -327,7 +308,7 @@ void CameraLibre::mouvementSouris (int xrel, int yrel)
 void CameraLibre::deplacement (int numDirection, bool valeur)
 {
         if (numDirection <= 5)
-                Mouvement[numDirection] = valeur;
+            Mouvement[numDirection] = valeur;
         else
             qDebug() << "Erreur 03 ; Mouvement du personnage non-autorisé";
 }

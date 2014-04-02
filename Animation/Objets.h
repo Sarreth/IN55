@@ -28,17 +28,11 @@ class Objet
                                                    // a l'interieur de la fonction loadTexture(); )
         void afficherObjet();
         void dessinerBoundBox();
-        int getNombreDeFaces();
-        void setPossedeCollisionBox(bool possedeBox);
         bool getPossedeCollisionBox();
 
-
-        void setIsVisible(bool visible);
-        bool getIsVisible();
         void setPosition(Coord3D position);
         Coord3D getPosition();
         Coord3D getCollisionBox();
-        QString getNom();
 
 
     protected: //protected pour etre accessible à la classe personnage, heritant d'objet

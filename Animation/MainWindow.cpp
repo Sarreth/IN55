@@ -190,7 +190,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     mainScreenSize = widget.availableGeometry(widget.primaryScreen());
 
     qDebug() << "+ Resolution de l'écran : " << mainScreenSize.width() << "x" << mainScreenSize.height();
-    vuePrincipal = new OpenGLWidget (this, joueur, positionCamera, cibleCamera, _tailleTerrainX, _tailleTerrainY, liste_objets, nombreObjets, 0, "Vue Principale");
+    vuePrincipal = new OpenGLWidget (this, joueur, positionCamera, cibleCamera, _tailleTerrainX, _tailleTerrainY, liste_objets, nombreObjets,"Vue Principale");
 
     setCentralWidget(vuePrincipal);
 
@@ -236,10 +236,6 @@ void MainWindow::cycleTimerJeu()
 
 void MainWindow::mouseMoveEvent ( QMouseEvent *event )
 {
-
-    if (event)
-    {}
-
     if ( anti_repetition == false )//on verifie que ce n'est pas la fonction qui se rappelle elle meme (avec setPos) et que la souris est sur le bon widget
     {
         int xrel = (mainScreenSize.width()/2 - event->x());
@@ -254,7 +250,6 @@ void MainWindow::mouseMoveEvent ( QMouseEvent *event )
     }
     else
         anti_repetition = false;
-
 }
 
 
@@ -284,8 +279,7 @@ void MainWindow::wheelEvent ( QWheelEvent *event )
 
 void MainWindow::keyPressEvent ( QKeyEvent *event )
 {
-    Coord3D _posi;
-    _posi = joueur->getPosition();
+    Coord3D _posi(joueur->getPosition());
 
     switch ( event->key() )
     {
@@ -293,7 +287,7 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
             qApp->exit();
             break;
         case Qt::Key_P:
-            if ( enPause == false )
+            if ( !enPause )
             {
                 enPause = true;
                 stopperJeu();
