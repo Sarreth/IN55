@@ -33,9 +33,7 @@ CameraLibre::CameraLibre(bool isVisible, Coord3D position, Coord3D cibleCamera, 
         _theta = 0;
         ConversionVecteursVersAngles(); //calcul des angles phi et theta qui correspondent au _position et _targetCameraJoueur de dÃ©but de jeu
 
-        _up.X = 0; //vecteur definissant la verticale du monde
-        _up.Y = 0;
-        _up.Z = 1;
+        _up=Coord3D(0,0,1);
 
 }
 
@@ -57,7 +55,6 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
 
         if (Mouvement[AVANCER])
         {
-
             _position.X += _forward.X * _vitesse;
             //debut test collision
             i=0;
@@ -68,11 +65,8 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
                     _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
                 i++;
             }//Fin test collision
-
             if (_collision)
                 _position.X -= _forward.X * _vitesse;
-
-
 
             _position.Y += _forward.Y * _vitesse;
             //debut test collision
@@ -210,10 +204,10 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
         ////////////////////////////////////////////////////////////////////////
 
         ConversionAnglesVersVecteurs(); //recalcule les coordonnees du vecteur de direction du regard a partir des angles _phi et _theta
-        _cibleCamera.X = _forward.X + (_position.X +1); //comme on a bouge, on recalcule la cible fixee par la camera
-        _cibleCamera.Y = _forward.Y + (_position.Y +1); // en ajustant pour car la camera n'est pas exactement a la position du jour
-        _cibleCamera.Z = _forward.Z + (_position.Z +6); // mais decalé de (1,1,6)
-
+        //comme on a bouge, on recalcule la cible fixee par la camera
+        // en ajustant pour car la camera n'est pas exactement a la position du jour
+        // mais decalé de (1,1,6)
+        _cibleCamera = Coord3D(_forward.X + (_position.X +1),_forward.Y + (_position.Y +1),_forward.Z + (_position.Z +6));
         _left = _up.crossProduct(_forward); //recalcule le vecteur perdendiculaire au vecteur up et target pour se deplacer vers la gauche ou la droite
         _left.normalize();
 

@@ -1,31 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QApplication>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QPoint>
-#include <QCheckBox>
-#include <QMenuBar>
-#include <QProgressBar>
-#include <QWidget>
-#include <QSpacerItem>
-#include <QString>
-#include <QFile>
-#include <QTimer>
-#include <iostream>
-#include <QDebug>
-#include <QStringList>
-
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#include "Coord3D.h"
 #include "OpenGLWidget.h"
-#include "CameraLibre.h"
 
 class MainWindow : public QMainWindow
 {

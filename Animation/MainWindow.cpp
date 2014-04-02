@@ -7,8 +7,6 @@
 #define SAUT 4
 #define ACCROUPI 5
 
-#include <QDesktopWidget>
-
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     QApplication::setOverrideCursor( QCursor( Qt::BlankCursor ));

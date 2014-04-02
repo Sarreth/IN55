@@ -1,11 +1,7 @@
 #ifndef CAMERALIBRE_H
 #define CAMERALIBRE_H
 
-#include <QString>
-
-#include "Coord3D.h"
 #include "Objets.h"
-
 
 class CameraLibre : public Objet
 {

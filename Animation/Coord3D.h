@@ -2,6 +2,37 @@
 #define COORD3D_H
 
 #include <cmath>
+#include <vector>
+#include <iostream>
+
+#include <QDesktopWidget>
+#include <QString>
+#include <QStringList>
+#include <QMainWindow>
+#include <QApplication>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QPoint>
+#include <QCheckBox>
+#include <QMenuBar>
+#include <QProgressBar>
+#include <QWidget>
+#include <QSpacerItem>
+#include <QFile>
+#include <QTimer>
+#include <QImage>
+#include <QDebug>
+#include <QSound>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QKeyEvent>
+
+
+#include <QtOpenGL/QGLWidget>
+#include <GL/gl.h>
+#include <GL/glu.h>
 
 class Coord3D
 {

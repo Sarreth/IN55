@@ -68,7 +68,10 @@ void Objet::loadMesh()
     QFile file(_fichierMesh);
 
     if (!file.open(QIODevice::ReadOnly)) //si il y a une erreur a l'ouverture
+    {
+        qDebug() << "----->ERREUR 03 ; Ouverture fichier : FAILED";
         _chargementMeshOk = false;
+    }
     else //si il a reussi a le lire
     {
         _nombreDeFaces = 0;
@@ -306,9 +309,7 @@ void Objet::afficherObjet()
 
     }
     else if (!(_chargementMeshOk) || !(_chargementTextureOk))
-    {
         qDebug() << "Erreur du mesh ou de texture, l'objet " << _nomObjet << " ne sera pas affichee";
-    }
 }
 
 

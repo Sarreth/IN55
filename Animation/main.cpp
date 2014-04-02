@@ -1,5 +1,3 @@
-#include <QApplication>
-#include <QtOpenGL/QGLWidget>
 #include "MainWindow.h"
 
 int main(int argc, char *argv[])

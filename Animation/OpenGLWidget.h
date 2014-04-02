@@ -1,21 +1,6 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-
-#include <cmath>
-#include <vector>
-
-#include <QtOpenGL/QGLWidget>
-#include <QImage>
-#include <QTextStream>
-#include <QMessageBox>
-#include <QDebug>
-#include <QString>
-#include <QKeyEvent>
-
-#include "Coord3D.h"
 #include "CameraLibre.h"
 
 class OpenGLWidget : public QGLWidget
@@ -50,7 +35,6 @@ class OpenGLWidget : public QGLWidget
                 int _nombreObjets; //information transmise par mainwindow
                 Coord3D _positionObjet; //information que l'on va recuperer a laide du pointeur sur chaque objet
                 Coord3D _orientationObjet;
-                std::vector< std::vector< std::vector< float > > > *p_tableauVectrices;
 
                 int _nombreDeTextures;
                 GLuint texturesGun1, texturesGun2,textureSol, textureJoueur,textureVueInactive;

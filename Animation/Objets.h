@@ -1,19 +1,6 @@
 #ifndef OBJETS_H
 #define OBJETS_H
 
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <cmath>
-#include <vector>
-#include <QtOpenGL/QGLWidget>
-#include <QImage>
-
-#include <QDebug>
-#include <QFile>
-#include <QString>
-
-#include <QSound>
-#include <QStringList>
 #include "Coord3D.h"
 
 class Objet

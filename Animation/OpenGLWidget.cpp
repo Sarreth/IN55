@@ -12,9 +12,7 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLi
 
     _nombreObjets = nombreObjets;
     for (int i=0 ; i < _nombreObjets ; i++)
-        {
         p_listeObjets[i] = listeObjets[i];
-        }
 
     _positionCamera = positionCamera;
     _cibleCamera = targetCamera;
@@ -38,9 +36,7 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D posit
 
     _nombreObjets = nombreObjets;
     for (int i=0 ; i < _nombreObjets ; i++)
-        {
         p_listeObjets[i] = listeObjets[i];
-        }
 
     _positionCamera = positionCamera;
     _cibleCamera = targetCamera;
@@ -113,8 +109,7 @@ GLuint OpenGLWidget::loadTexture ( QString filename, bool useMipMap)
         QImage baseTexture, interTexture;
         GLuint finalTexture;
 
-        bool etatChargement = baseTexture.load ( filename, "PNG" ); //chargement de l'image, etatChargement contient true si cest chargÃ©
-        if (etatChargement == false)
+        if (!baseTexture.load ( filename, "PNG" ))
             qDebug() << "----->ERREUR 02 ; Chargement textureGun = FAILED";
 
         interTexture = QGLWidget::convertToGLFormat ( baseTexture ); //transformation et renversement de l'image
