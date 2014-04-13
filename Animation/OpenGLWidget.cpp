@@ -19,9 +19,9 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLi
 
     setFixedSize ( largeur, hauteur );
     setFormat ( QGLFormat ( QGL::DoubleBuffer | QGL::DepthBuffer ) );
+    loadSkybox();
 
     a=0;
-
     qDebug() << "+ Creation du GLwidget : " << _nomDeClasse << " : OK";
 
 }
@@ -46,12 +46,19 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D posit
     a=0;
 
     qDebug() << "+ Creation du GLwidget : " << _nomDeClasse << " : OK";
+    loadSkybox();
 
 }
 
 void OpenGLWidget::initializeGL()
 {
+
         qglClearColor ( Qt::black );
+        float LightAmbient[]= { 0.75f, 0.75f, 0.75f, 1.0f };
+        float LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
+        float LightPosition[]= { 40.0f, 25.0f, 10.0f, 1.0f };
+        float difLight0[4] = {0.75f, 0.75f, 0.75f, 1.0f};
+        float specLight0[4] = {0.75f, 0.75f, 0.75f, 1.0f};
 
         /////////////////////Eclairage/////////////////////////////////////
         float colorWhite[4]  = {1.0f,1.0f,1.0f,1.0f};
@@ -77,6 +84,12 @@ void OpenGLWidget::initializeGL()
             glLightfv( GL_LIGHT3, GL_SPECULAR, colorWhite );
             glLightf(GL_LIGHT3,GL_LINEAR_ATTENUATION ,0.1f);
         glDisable(GL_LIGHT3);
+
+        glEnable(GL_LIGHT4);            // Active light3, qui va suivre le projectile lors du tir
+            glLightfv( GL_LIGHT4, GL_AMBIENT, LightAmbient );
+            glLightfv( GL_LIGHT4, GL_DIFFUSE, difLight0 );
+            glLightfv(GL_LIGHT4, GL_SPECULAR, specLight0);
+        //glDisable(GL_LIGHT4);
         /*config reflection lumière sur les matériaux*/
         int MatSpec [4] = {1,1,1,1};
         float ambient[4] = {0.55f,0.55f,0.55f,1.0f};
@@ -86,7 +99,6 @@ void OpenGLWidget::initializeGL()
         glMateriali(GL_FRONT_AND_BACK,GL_SHININESS,100);
         /*fin config lum*/
         ///////////////////////////////////////////////////////////////////
-
 
         /////////////////////Texture des divers objets du joueur//////////////
         textureSol = loadTexture ( QString ( "pics/floor.png" ), true);
@@ -98,11 +110,85 @@ void OpenGLWidget::initializeGL()
             p_listeObjets[i]->genererTextureOpenGL(true);
 
         p_joueur->genererTextureOpenGL(true);
+        loadSkybox();
 
         qDebug() << "+ Initialisation OpenGL de" << _nomDeClasse << ": OK";;
 }
 
+void OpenGLWidget::loadSkybox()
+{
+    cube_map_texture_ID[0]=loadTexture("sky/front",false);
+    cube_map_texture_ID[1]=loadTexture("sky/back",false);
+    cube_map_texture_ID[2]=loadTexture("sky/left",false);
+    cube_map_texture_ID[3]=loadTexture("sky/right",false);
+    cube_map_texture_ID[4]=loadTexture("sky/up",false);
+    cube_map_texture_ID[5]=loadTexture("sky/down",false);
 
+}
+
+void OpenGLWidget::drawSkybox()
+{
+    // R�glage de l'orientation
+    glPushMatrix();
+
+    glBindTexture(GL_TEXTURE_2D,cube_map_texture_ID[3]);
+    glBegin(GL_QUADS);
+        glTexCoord2d(0,0); glVertex3d(0,0,-50);
+        glTexCoord2d(0,1); glVertex3d(0,0,72);
+        glTexCoord2d(1,1); glVertex3d(0,162,72);
+        glTexCoord2d(1,0); glVertex3d(0,162,-50);
+    glEnd();
+glRotated(90,0,0,1);
+
+glBindTexture(GL_TEXTURE_2D,cube_map_texture_ID[0]);
+    glBegin(GL_QUADS);
+        glTexCoord2d(0,0); glVertex3d(0,-162,-50);
+        glTexCoord2d(0,1); glVertex3d(0,-162,72);
+        glTexCoord2d(1,1); glVertex3d(0,0,72);
+        glTexCoord2d(1,0); glVertex3d(0,0,-50);
+    glEnd();
+glRotated(-90,0,0,1);
+
+glBindTexture(GL_TEXTURE_2D,cube_map_texture_ID[2]);
+    glBegin(GL_QUADS);
+        glTexCoord2d(0,0); glVertex3d(162,162,-50);
+        glTexCoord2d(0,1); glVertex3d(162,162,72);
+        glTexCoord2d(1,1); glVertex3d(162,0,72);
+        glTexCoord2d(1,0); glVertex3d(162,0,-50);
+    glEnd();
+glRotated(-90,0,0,1);
+
+glBindTexture(GL_TEXTURE_2D,cube_map_texture_ID[1]);
+    glBegin(GL_QUADS);
+        glTexCoord2d(0,0); glVertex3d(-162,0,-50);
+        glTexCoord2d(0,1); glVertex3d(-162,0,72);
+        glTexCoord2d(1,1); glVertex3d(-162,162,72);
+        glTexCoord2d(1,0); glVertex3d(-162,162,-50);
+    glEnd();
+glRotated(90,0,0,1);
+
+glPopMatrix();
+
+glBindTexture(GL_TEXTURE_2D,cube_map_texture_ID[5]);
+glBegin(GL_QUADS);
+
+    glTexCoord2d(1,0); glVertex3d(0,0,-0.01);
+    glTexCoord2d(1,1); glVertex3d(162,0,-0.01);
+    glTexCoord2d(0,1); glVertex3d(162,162,-0.01);
+    glTexCoord2d(0,0);  glVertex3d(0,162,-0.01);
+glEnd();
+
+
+glBindTexture(GL_TEXTURE_2D,cube_map_texture_ID[4]);
+glBegin(GL_QUADS);
+
+    glTexCoord2d(0,0); glVertex3d(0,0,72);
+    glTexCoord2d(0,1); glVertex3d(162,0,72);
+    glTexCoord2d(1,1); glVertex3d(162,162,72);
+    glTexCoord2d(1,0);  glVertex3d(0,162,72);
+glEnd();
+glPopMatrix();
+}
 
 GLuint OpenGLWidget::loadTexture ( QString filename, bool useMipMap)
 {
@@ -110,7 +196,7 @@ GLuint OpenGLWidget::loadTexture ( QString filename, bool useMipMap)
         GLuint finalTexture;
 
         if (!baseTexture.load ( filename, "PNG" ))
-            qDebug() << "----->ERREUR 02 ; Chargement textureGun = FAILED";
+            qDebug() << "----->ERREUR 02 ; Chargement texture = FAILED";
 
         interTexture = QGLWidget::convertToGLFormat ( baseTexture ); //transformation et renversement de l'image
         glGenTextures ( 1, &finalTexture ); //generation de la texture openGL, Ã  ce niveau ont pourrait renvoyer finalTexture
@@ -216,6 +302,7 @@ void OpenGLWidget::ConversionVecteursVersAngles() //transforme les coordonnÃ©e
 
 void OpenGLWidget::resizeGL ( int width, int height )
 {
+
     glViewport ( 0, 0, width, height );
     glMatrixMode ( GL_PROJECTION );
     glLoadIdentity();
@@ -228,10 +315,11 @@ void OpenGLWidget::resizeGL ( int width, int height )
 
 void OpenGLWidget::paintGL()
 {
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
     ////////////////////////////////////
     /////Placement de la camera//////
     ////////////////////////////////////
@@ -282,7 +370,10 @@ void OpenGLWidget::paintGL()
             gluDeleteQuadric(params2);
     glPopMatrix();
     a+=1; //l'angle de rotation de la lumière
-
+    glPushMatrix();
+        glLightfv( GL_LIGHT4, GL_SPOT_DIRECTION, spot1Dir );
+        glLightfv(GL_LIGHT4,GL_POSITION,spot1Pos);
+    glPopMatrix();
     // Et la LIGHT1 qui est un spot (dirigé vers la chaise)
     glPushMatrix();
         glTranslated(48,30,8);
@@ -300,6 +391,9 @@ void OpenGLWidget::paintGL()
     //////////////////////////////
     dessinerRepere();
     glEnable ( GL_TEXTURE_2D );
+
+    drawSkybox();
+
     ////On dessine le sol
     glBindTexture ( GL_TEXTURE_2D, textureSol );
     glBegin ( GL_TRIANGLES );

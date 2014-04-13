@@ -28,6 +28,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QOpenGLVertexArrayObject>
 
 #include <QtOpenGL/QGLWidget>
 #include <GL/gl.h>

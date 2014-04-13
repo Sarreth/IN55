@@ -3,6 +3,7 @@
 
 #include "CameraLibre.h"
 
+
 class OpenGLWidget : public QGLWidget
 {
         //Q_OBJECT
@@ -16,6 +17,11 @@ class OpenGLWidget : public QGLWidget
                 static void dessinerRepere();
 
                 void ConversionVecteursVersAngles();
+
+                void loadSkybox();
+                void drawSkybox();
+                GLuint cube_map_texture_ID[6];
+                QImage texture_image[6];
 
                 bool _vueActive;
 
@@ -39,7 +45,6 @@ class OpenGLWidget : public QGLWidget
                 int _nombreDeTextures;
                 GLuint texturesGun1, texturesGun2,textureSol, textureJoueur,textureVueInactive;
                 QString _nomDeClasse;
-
 
                 int a; //angle de rotation de la sphere de lumière
 };
