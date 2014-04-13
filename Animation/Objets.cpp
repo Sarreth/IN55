@@ -222,15 +222,20 @@ void Objet::loadMesh()
 
 void Objet::loadTexture()
 {
-    if(_imageBase.load ( _fichierTexture, "PNG" ))//chargement fichier image
-    {
+    if(_fichierTexture.compare("null")==0)
         _chargementTextureOk=true;
-        _imageTextureQT = QGLWidget::convertToGLFormat ( _imageBase ); //transformation et renversement de l'image
-        qDebug() << "+ Chargement texture objet " << _nomObjet << " : OK";
-    }else//si erreur
+    else
     {
-        qDebug() << "----->ERREUR 02 ; Chargement texture " << _nomObjet << " = FAILED";
-        _chargementTextureOk=false;
+        if(_imageBase.load ( _fichierTexture, "PNG" ))//chargement fichier image
+        {
+            _chargementTextureOk=true;
+            _imageTextureQT = QGLWidget::convertToGLFormat ( _imageBase ); //transformation et renversement de l'image
+            qDebug() << "+ Chargement texture objet " << _nomObjet << " : OK";
+        }else//si erreur
+        {
+            qDebug() << "----->ERREUR 02 ; Chargement texture " << _nomObjet << " = FAILED";
+            _chargementTextureOk=false;
+        }
     }
 
 }

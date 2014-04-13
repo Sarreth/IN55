@@ -222,3 +222,5 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.0-pre1
+*.15
