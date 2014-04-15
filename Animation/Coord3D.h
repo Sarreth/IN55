@@ -4,6 +4,8 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <string>
+#include <fstream>
 
 #include <QDesktopWidget>
 #include <QString>
@@ -29,6 +31,8 @@
 #include <QMessageBox>
 #include <QKeyEvent>
 #include <QOpenGLVertexArrayObject>
+#include <QQuaternion>
+#include <QMatrix4x4>
 
 #include <QtOpenGL/QGLWidget>
 #include <GL/gl.h>

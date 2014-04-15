@@ -1,7 +1,7 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include "CameraLibre.h"
+#include "MD5Model.h"
 
 
 class OpenGLWidget : public QGLWidget
@@ -42,8 +42,9 @@ class OpenGLWidget : public QGLWidget
                 Coord3D _positionObjet; //information que l'on va recuperer a laide du pointeur sur chaque objet
                 Coord3D _orientationObjet;
 
+                MD5Model g_model;
                 int _nombreDeTextures;
-                GLuint texturesGun1, texturesGun2,textureSol, textureJoueur,textureVueInactive;
+                GLuint textureSol, textureJoueur;
                 QString _nomDeClasse;
 
                 int a; //angle de rotation de la sphere de lumière

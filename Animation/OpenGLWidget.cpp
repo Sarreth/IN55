@@ -55,8 +55,6 @@ void OpenGLWidget::initializeGL()
 
         qglClearColor ( Qt::black );
         float LightAmbient[]= { 0.75f, 0.75f, 0.75f, 1.0f };
-        float LightDiffuse[]= { 1.0f, 1.0f, 1.0f, 1.0f };
-        float LightPosition[]= { 40.0f, 25.0f, 10.0f, 1.0f };
         float difLight0[4] = {0.75f, 0.75f, 0.75f, 1.0f};
         float specLight0[4] = {0.75f, 0.75f, 0.75f, 1.0f};
 
@@ -103,7 +101,9 @@ void OpenGLWidget::initializeGL()
         /////////////////////Texture des divers objets du joueur//////////////
         textureSol = loadTexture ( QString ( "pics/floor.png" ), true);
         textureJoueur = loadTexture ( QString ( "pics/whisp.png" ), true);
-        textureVueInactive = loadTexture ( QString ( "pics/vueInactive.png" ), true);
+
+        g_model.loadModel( "Meshs/girl3D.md5mesh" );
+
         /////////////////////////////////////////////////////////////////////
 
         for (int i=0 ; i < _nombreObjets ; i++)
@@ -422,6 +422,7 @@ void OpenGLWidget::paintGL()
     // transparente soit caché par les opaque devant (c'est pour cette derniere raison qu'on ne desactive pas le DEPTH_TEST;
     int indexObjet = 0;
     vector< int > tableau(_nombreObjets,0);
+    g_model.render();
 
     for (int i=0 ; i < _nombreObjets ; i++)
             p_listeObjets[i]->afficherObjet();
