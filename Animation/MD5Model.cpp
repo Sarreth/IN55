@@ -21,7 +21,7 @@ GLuint MD5Model::loadTexture ( string filename, bool useMipMap)
         QImage baseTexture, interTexture;
         GLuint finalTexture;
 
-        if (!baseTexture.load ( "pics/whisp.png", "PNG" ))
+        if (!baseTexture.load ( QString::fromStdString(filename), "PNG" ))
             qDebug() << "----->ERREUR 02 ; Chargement texture" << QString::fromStdString(filename) << "= FAILED";
 
         interTexture = QGLWidget::convertToGLFormat ( baseTexture ); //transformation et renversement de l'image
@@ -173,8 +173,6 @@ bool MD5Model::loadModel( const string &filename )
                         texturePath = parent_path + "/" + shaderPath;
 
 
-                    texturePath.substr(0,texturePath.find_last_of("."));
-                    texturePath+= ".tga" ;
 
                     mesh.m_TexID = loadTexture( texturePath.c_str(), false );
 
@@ -417,8 +415,8 @@ void MD5Model::render()
 
 //    m_Animation.Render();
 
-    for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
-        renderNormals( m_Meshes[i] );
+//    for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
+//        renderNormals( m_Meshes[i] );
 
     glPopMatrix();
 }
