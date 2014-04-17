@@ -1,13 +1,51 @@
 #ifndef OBJETS_H
 #define OBJETS_H
 
-#include "Coord3D.h"
+#include <cmath>
+#include <vector>
+#include <iostream>
+#include <string>
+#include <fstream>
+
+#include <QDesktopWidget>
+#include <QString>
+#include <QStringList>
+#include <QMainWindow>
+#include <QApplication>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QPoint>
+#include <QCheckBox>
+#include <QMenuBar>
+#include <QProgressBar>
+#include <QWidget>
+#include <QSpacerItem>
+#include <QFile>
+#include <QTimer>
+#include <QImage>
+#include <QDebug>
+#include <QSound>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QKeyEvent>
+#include <QOpenGLVertexArrayObject>
+
+#include <QVector3D>
+#include <QQuaternion>
+#include <QMatrix4x4>
+
+#include <QtOpenGL/QGLWidget>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
 
 class Objet
 {
 
     public:
-        Objet(bool visible, Coord3D position, Coord3D orientation, bool possedeCollisionBox, Coord3D diagonaleBox, bool rotation90degBoundBox = false, QString nomObjet = "", QString fichierMesh = "", QString fichierTexture = "", bool textureUV = false, int repeatx = 1, int repeaty = 1);
+        Objet(bool visible, QVector3D position, QVector3D orientation, bool possedeCollisionBox, QVector3D diagonaleBox, bool rotation90degBoundBox = false, QString nomObjet = "", QString fichierMesh = "", QString fichierTexture = "", bool textureUV = false, int repeatx = 1, int repeaty = 1);
 
         void genererTextureOpenGL(bool useMipMap); //car les fonctions de chargement de texture openGL ne peuvent Ãªtre appelÃ©
                                                    //qu'apres que le widget QGLWidget correspondant ait initialisÃ© les variables opengGL
@@ -17,9 +55,9 @@ class Objet
         void dessinerBoundBox();
         bool getPossedeCollisionBox();
 
-        void setPosition(Coord3D position);
-        Coord3D getPosition();
-        Coord3D getCollisionBox();
+        void setPosition(QVector3D position);
+        QVector3D getPosition();
+        QVector3D getCollisionBox();
 
 
     protected: //protected pour etre accessible à la classe personnage, heritant d'objet
@@ -27,10 +65,10 @@ class Objet
         void loadTexture();
 
         QString _nomObjet;
-        Coord3D _position;
-        Coord3D _orientation;
+        QVector3D _position;
+        QVector3D _orientation;
         bool _possedeCollisionBox;
-        Coord3D _collisionBox;
+        QVector3D _collisionBox;
         bool _rotation90degCollisionBox; //si true, la boundbox dois etre tourné de 90 degré
         bool _isVisible; //faut-il l'afficher?
 

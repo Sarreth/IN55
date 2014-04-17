@@ -23,9 +23,8 @@ Attention avec les coordonnees spheriques (r,theta,phi) on a phi langle a partir
 */
 
 
-Objet::Objet(bool visible, Coord3D position, Coord3D orientation, bool possedeCollisionBox, Coord3D collisionBox, bool rotation90degCollisionBox, QString nomObjet, QString fichierMesh, QString fichierTexture, bool textureUV, int repeatx, int repeaty)
+Objet::Objet(bool visible, QVector3D position, QVector3D orientation, bool possedeCollisionBox, QVector3D collisionBox, bool rotation90degCollisionBox, QString nomObjet, QString fichierMesh, QString fichierTexture, bool textureUV, int repeatx, int repeaty)
 {
-    float tampon=0;
     _isVisible = visible;
     _position = position;
     _orientation = orientation;
@@ -36,11 +35,7 @@ Objet::Objet(bool visible, Coord3D position, Coord3D orientation, bool possedeCo
     //Rotation de la bound box avec la rotation de l'objet//
     ////////////////////////////////////////////////////////
     if ((_rotation90degCollisionBox = rotation90degCollisionBox))
-    {
-        tampon = _collisionBox.X;
-        _collisionBox.X = _collisionBox.Y;
-        _collisionBox.Y = tampon;
-    }
+        _collisionBox=QVector3D(_collisionBox.y(),_collisionBox.x(),_collisionBox.z());
     ////////////////////////////////////////////////////////
 
     _nomObjet = nomObjet;
@@ -247,14 +242,14 @@ void Objet::afficherObjet()
     if ((_chargementMeshOk) && (_chargementTextureOk) && (_isVisible))
     {
         glPushMatrix();
-        glTranslated ( _position.X,_position.Y,_position.Z );
+        glTranslated ( _position.x(),_position.y(),_position.z() );
 
-        if (_orientation.X != 0)
-            glRotated ( _orientation.X,1,0,0 );
-        if (_orientation.Y != 0)
-            glRotated ( _orientation.Y,0,1,0 );
-        if (_orientation.Z != 0)
-            glRotated ( _orientation.Z,0,0,1 );
+        if (_orientation.x() != 0)
+            glRotated ( _orientation.x(),1,0,0 );
+        if (_orientation.y() != 0)
+            glRotated ( _orientation.y(),0,1,0 );
+        if (_orientation.z() != 0)
+            glRotated ( _orientation.z(),0,0,1 );
 
         glBindTexture ( GL_TEXTURE_2D, _textureFinaleObjet );
         glBegin ( GL_TRIANGLES );
@@ -327,38 +322,38 @@ void Objet::dessinerBoundBox()
         glLineWidth(6);
         glPushMatrix();
 
-        glTranslated ( _position.X,_position.Y,_position.Z );
+        glTranslated ( _position.x(),_position.y(),_position.y() );
 
         glBegin(GL_LINES);
 
         glColor3ub(0,0,255); //axe X en Bleu
 
         glVertex3f(0,0,0);
-        glVertex3f(_collisionBox.X,  0 , 0);
-        glVertex3f(_collisionBox.X , 0 , 0);
-        glVertex3f(_collisionBox.X , 0 , _collisionBox.Z);
-        glVertex3f(_collisionBox.X , 0 , _collisionBox.Z);
-        glVertex3f(0 , 0 , _collisionBox.Z);
-        glVertex3f(0 , 0 , _collisionBox.Z);
-        glVertex3f(0 , 0 , 0);
+        glVertex3f(_collisionBox.x(), 0, 0);
+        glVertex3f(_collisionBox.x(), 0, 0);
+        glVertex3f(_collisionBox.x(), 0, _collisionBox.z());
+        glVertex3f(_collisionBox.x(), 0, _collisionBox.z());
+        glVertex3f(0, 0, _collisionBox.z());
+        glVertex3f(0, 0, _collisionBox.z());
+        glVertex3f(0, 0, 0);
 
-        glVertex3f(_collisionBox.X,0,0);
-        glVertex3f(_collisionBox.X,_collisionBox.Y,0);
+        glVertex3f(_collisionBox.x(),0,0);
+        glVertex3f(_collisionBox.x(),_collisionBox.y(),0);
         glVertex3f(0 , 0 , 0);
-        glVertex3f(0 , _collisionBox.Y , 0);
-        glVertex3f(0 , 0 , _collisionBox.Z);
-        glVertex3f(0 , _collisionBox.Y , _collisionBox.Z);
-        glVertex3f(_collisionBox.X , 0 , _collisionBox.Z);
-        glVertex3f(_collisionBox.X , _collisionBox.Y , _collisionBox.Z);
+        glVertex3f(0 , _collisionBox.y() , 0);
+        glVertex3f(0 , 0 , _collisionBox.z());
+        glVertex3f(0 , _collisionBox.y() , _collisionBox.z());
+        glVertex3f(_collisionBox.x() , 0 , _collisionBox.z());
+        glVertex3f(_collisionBox.x() , _collisionBox.y() , _collisionBox.z());
 
-        glVertex3f(0,_collisionBox.Y,_collisionBox.Z);
-        glVertex3f(_collisionBox.X,_collisionBox.Y,_collisionBox.Z);
-        glVertex3f(_collisionBox.X,_collisionBox.Y,_collisionBox.Z);
-        glVertex3f(_collisionBox.X,_collisionBox.Y,0);
-        glVertex3f(_collisionBox.X,_collisionBox.Y,0);
-        glVertex3f(0 ,_collisionBox.Y,0);
-        glVertex3f(0 ,_collisionBox.Y,0);
-        glVertex3f(0 ,_collisionBox.Y,_collisionBox.Z);
+        glVertex3f(0,_collisionBox.y(),_collisionBox.z());
+        glVertex3f(_collisionBox.x(),_collisionBox.y(),_collisionBox.z());
+        glVertex3f(_collisionBox.x(),_collisionBox.y(),_collisionBox.z());
+        glVertex3f(_collisionBox.x(),_collisionBox.y(),0);
+        glVertex3f(_collisionBox.x(),_collisionBox.y(),0);
+        glVertex3f(0 ,_collisionBox.y(),0);
+        glVertex3f(0 ,_collisionBox.y(),0);
+        glVertex3f(0 ,_collisionBox.y(),_collisionBox.z());
 
 
         glColor3ub(255,255,255);
@@ -401,17 +396,17 @@ void Objet::genererTextureOpenGL(bool useMipMap)
 
 }
 
-void Objet::setPosition(Coord3D position)
+void Objet::setPosition(QVector3D position)
 {
     _position = position;
 }
 
-Coord3D Objet::getPosition()
+QVector3D Objet::getPosition()
 {
     return _position;
 }
 
-Coord3D Objet::getCollisionBox()
+QVector3D Objet::getCollisionBox()
 {
     return _collisionBox;
 }

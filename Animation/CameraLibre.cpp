@@ -10,7 +10,7 @@
 #define ROTA_SUPP 0.1
 #define ROTA_SUPP_MAX 8
 
-CameraLibre::CameraLibre(bool isVisible, Coord3D position, Coord3D cibleCamera, Coord3D orientation, bool possedeCollisionBox, Coord3D diagonaleCollisionBox, bool rotation90degCollisionBox, float vitesseJoueur, float sensivity, QString fichierMesh, QString fichierTexture, bool isTextureUVmap)
+CameraLibre::CameraLibre(bool isVisible, QVector3D position, QVector3D cibleCamera, QVector3D orientation, bool possedeCollisionBox, QVector3D diagonaleCollisionBox, bool rotation90degCollisionBox, float vitesseJoueur, float sensivity, QString fichierMesh, QString fichierTexture, bool isTextureUVmap)
                          : Objet(isVisible, position, orientation, possedeCollisionBox, diagonaleCollisionBox, rotation90degCollisionBox, "Personnage", fichierMesh, fichierTexture, isTextureUVmap)
 {
         _cibleCamera = cibleCamera;
@@ -33,7 +33,7 @@ CameraLibre::CameraLibre(bool isVisible, Coord3D position, Coord3D cibleCamera, 
         _theta = 0;
         ConversionVecteursVersAngles(); //calcul des angles phi et theta qui correspondent au _position et _targetCameraJoueur de dÃ©but de jeu
 
-        _up=Coord3D(0,0,1);
+        _up=QVector3D(0,0,1);
 
 }
 
@@ -42,20 +42,20 @@ CameraLibre::CameraLibre(bool isVisible, Coord3D position, Coord3D cibleCamera, 
 void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerrainX, int tailleTerrainY)
 {
         int i=0; //pour les tests de collision
-        if (_position.X < 0) //pour ne pas sortir
-                _position.X = 0;
-        else	if (_position.X > tailleTerrainX*4)
-                _position.X = tailleTerrainX*4;
+        if (_position.x() < 0) //pour ne pas sortir
+                _position.setX(0);
+        else	if (_position.x() > tailleTerrainX*4)
+                _position.setX(tailleTerrainX*4);
 
-        if (_position.Y < 0)
-                _position.Y = 0;
-        else if (_position.Y > tailleTerrainY*4)
-                _position.Y = tailleTerrainY*4;
+        if (_position.y() < 0)
+                _position.setY(0);
+        else if (_position.y() > tailleTerrainY*4)
+                _position.setY(tailleTerrainY*4);
 
 
         if (Mouvement[AVANCER])
         {
-            _position.X += _forward.X * _vitesse;
+            _position += QVector3D(_forward.x()* _vitesse,0,0);
             //debut test collision
             i=0;
             _collision = false;
@@ -66,9 +66,9 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
                 i++;
             }//Fin test collision
             if (_collision)
-                _position.X -= _forward.X * _vitesse;
+                _position -= QVector3D(_forward.x()* _vitesse,0,0);
 
-            _position.Y += _forward.Y * _vitesse;
+            _position += QVector3D(0,_forward.y() * _vitesse,0);
             //debut test collision
             i=0;
             _collision = false;
@@ -80,13 +80,13 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
             }//Fin test collision
 
             if (_collision)
-                _position.Y -= _forward.Y * _vitesse;
+                _position -= QVector3D(0,_forward.y() * _vitesse,0);
 
         }
         if (Mouvement[RECULER])
         {
-            _position.X -= _forward.X * _vitesse;
-            _position.Y -= _forward.Y * _vitesse;
+            _position -= QVector3D(_forward.x() * _vitesse,0,0);
+            _position -= QVector3D(0,_forward.y() * _vitesse,0);
         }
         if (Mouvement[GAUCHE])
         {
@@ -122,25 +122,12 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
 
 
         if (Mouvement[ACCROUPI])
-        {
-            if ((!joueurAccroupi) && (!Mouvement[SAUT]))
-            {
-                _position.Z -= 2;
-                joueurAccroupi = true;
-            }
-        }
+                _position -= QVector3D(0,0,1);
 
-        if (!Mouvement[ACCROUPI])
-        {
-            if (joueurAccroupi)
-            {
-                _position.Z += 2;
-                joueurAccroupi = false;
-            }
-        }
-
+        if (Mouvement[SAUT])
+            _position += QVector3D(0,0,1);
         ////////////////////////////GESTION DU SAUT////////////////////////////
-
+/*
         if ((Mouvement[SAUT]) || (saut.enCollision))
         {
             if ((Mouvement[SAUT]) && (saut.enCollision))
@@ -201,26 +188,27 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
                 saut.step = 0;
             }
         }
+*/
         ////////////////////////////////////////////////////////////////////////
 
         ConversionAnglesVersVecteurs(); //recalcule les coordonnees du vecteur de direction du regard a partir des angles _phi et _theta
         //comme on a bouge, on recalcule la cible fixee par la camera
         // en ajustant pour car la camera n'est pas exactement a la position du jour
         // mais decalé de (1,1,6)
-        _cibleCamera = Coord3D(_forward.X + (_position.X +1),_forward.Y + (_position.Y +1),_forward.Z + (_position.Z +6));
-        _left = _up.crossProduct(_forward); //recalcule le vecteur perdendiculaire au vecteur up et target pour se deplacer vers la gauche ou la droite
+        _cibleCamera = QVector3D(_forward.x() + (_position.x() +1),_forward.y() + (_position.y() +1),_forward.z() + (_position.z() +6));
+        _left = QVector3D::crossProduct(_up,_forward); //recalcule le vecteur perdendiculaire au vecteur up et target pour se deplacer vers la gauche ou la droite
         _left.normalize();
 
 }
 
-bool CameraLibre::test_Collision(Coord3D positionObjet1, Coord3D boxObjet1, Coord3D positionObjet2, Coord3D boxObjet2)
+bool CameraLibre::test_Collision(QVector3D positionObjet1, QVector3D boxObjet1, QVector3D positionObjet2, QVector3D boxObjet2)
 {
-    if((positionObjet2.X >= positionObjet1.X + boxObjet1.X)      // trop à droite
-    || (positionObjet2.X + boxObjet2.X <= positionObjet1.X) // trop à gauche
-    || (positionObjet2.Y >= positionObjet1.Y + boxObjet1.Y) // trop en bas
-    || (positionObjet2.Y + boxObjet2.Y <= positionObjet1.Y)  // trop en haut
-    || (positionObjet2.Z >= positionObjet1.Z + boxObjet1.Z)   // trop derrière
-    || (positionObjet2.Z + boxObjet2.Z <= positionObjet1.Z))  // trop devant
+    if((positionObjet2.x() >= positionObjet1.x() + boxObjet1.x())   // trop à droite
+    || (positionObjet2.x() + boxObjet2.x() <= positionObjet1.x())   // trop à gauche
+    || (positionObjet2.y() >= positionObjet1.y() + boxObjet1.y())   // trop en bas
+    || (positionObjet2.y() + boxObjet2.y() <= positionObjet1.y())   // trop en haut
+    || (positionObjet2.z() >= positionObjet1.z() + boxObjet1.z())   // trop derrière
+    || (positionObjet2.z() + boxObjet2.z() <= positionObjet1.z()))  // trop devant
         return 0;
     else //si il y a collision
         return 1;
@@ -229,7 +217,7 @@ bool CameraLibre::test_Collision(Coord3D positionObjet1, Coord3D boxObjet1, Coor
 void CameraLibre::ConversionAnglesVersVecteurs() //tranforme les coordonnees_phi et _theta en vecteur qui donne la direction de la camera
 {
         float r_temp = sin(_phi*M_PI/180);
-        _forward = Coord3D(r_temp*cos(_theta*M_PI/180),r_temp*sin(_theta*M_PI/180),cos(_phi*M_PI/180));
+        _forward = QVector3D(r_temp*cos(_theta*M_PI/180),r_temp*sin(_theta*M_PI/180),cos(_phi*M_PI/180));
 }
 
 void CameraLibre::ConversionVecteursVersAngles() //tranforme les coordonnees X,Y,Z en _phi et _theta
@@ -243,15 +231,15 @@ void CameraLibre::ConversionVecteursVersAngles() //tranforme les coordonnees X,Y
         //_theta = arcos ( X / racine(X²+Y²) )
         //-La librairie <cmath> utilise les radians, il faut donc convertir a chaque fois les degres
 
-    _forward = Coord3D(_cibleCamera.X - (_position.X+1),_cibleCamera.Y - (_position.Y+1),_cibleCamera.Z - (_position.Z+5));
-    float r = sqrt(pow(_forward.X,2) + pow(_forward.Y,2) + pow(_forward.Z,2));
-    _phi = ( acos(_forward.Z/r)  *180/M_PI);
+    _forward = QVector3D(_cibleCamera.x() - (_position.x()+1),_cibleCamera.y() - (_position.y()+1),_cibleCamera.z() - (_position.z()+5));
+    float r = sqrt(pow(_forward.x(),2) + pow(_forward.y(),2) + pow(_forward.z(),2));
+    _phi = ( acos(_forward.z()/r)  *180/M_PI);
 
-    float r_temp = sqrt(pow(_forward.X,2) + pow(_forward.Y,2));
-    if (_forward.Y >= 0)
-            _theta = ( (acos(_forward.X/r_temp)) *180/M_PI);
+    float r_temp = sqrt(pow(_forward.x(),2) + pow(_forward.y(),2));
+    if (_forward.y() >= 0)
+            _theta = ((acos(_forward.x()/r_temp)) *180/M_PI);
     else
-            _theta = - (  (acos(_forward.X/r_temp))   *180/M_PI);
+            _theta = -((acos(_forward.x()/r_temp))*180/M_PI);
 
 
 }
@@ -294,7 +282,7 @@ void CameraLibre::mouvementSouris (int xrel, int yrel)
         else if (_theta < -180)
             _theta = 180;
 
-        _orientation.Z = _theta;
+        _orientation.setZ(_theta);
         ConversionAnglesVersVecteurs(); //et on convertit notre variation d'angle de vue en un vecteur (interpretable par la camera)
 }
 
@@ -317,7 +305,7 @@ float CameraLibre::getVitesse()
     return _vitesse;
 }
 
-Coord3D CameraLibre::getCibleCamera()
+QVector3D CameraLibre::getCibleCamera()
 {
     return _cibleCamera;
 }

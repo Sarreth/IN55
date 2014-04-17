@@ -20,15 +20,15 @@ public:
     GLuint loadTexture(std::string file, bool mipmap);
 
 protected:
-    typedef std::vector<Coord3D> PositionBuffer;
-    typedef std::vector<Coord3D> NormalBuffer;
+    typedef std::vector<QVector3D> PositionBuffer;
+    typedef std::vector<QVector3D> NormalBuffer;
     typedef std::vector<QPoint> Tex2DBuffer;
     typedef std::vector<GLuint> IndexBuffer;
 
     struct Vertex
     {
-        Coord3D     m_Pos;
-        Coord3D     m_Normal;
+        QVector3D     m_Pos;
+        QVector3D     m_Normal;
         QPoint      m_Tex0;
         int         m_StartWeight;
         int         m_WeightCount;
@@ -45,7 +45,7 @@ protected:
     {
         int             m_JointID;
         float           m_Bias;
-        Coord3D         m_Pos;
+        QVector3D         m_Pos;
     };
     typedef std::vector<Weight> WeightList;
 
@@ -53,7 +53,7 @@ protected:
     {
         std::string     m_Name;
         int             m_ParentID;
-        Coord3D         m_Pos;
+        QVector3D         m_Pos;
         QQuaternion     m_Orient;
     };
     typedef std::vector<Joint> JointList;

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
+OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, QVector3D positionCamera, QVector3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
 {
     _nomDeClasse = nomDeClasse;
     p_joueur = joueur;
@@ -26,7 +26,7 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLi
 
 }
 
-OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, Coord3D positionCamera, Coord3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
+OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, QVector3D positionCamera, QVector3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
 {
     _nomDeClasse = nomDeClasse;
     p_joueur = joueur;
@@ -54,14 +54,21 @@ void OpenGLWidget::initializeGL()
 {
 
         qglClearColor ( Qt::black );
-        float LightAmbient[]= { 0.75f, 0.75f, 0.75f, 1.0f };
-        float difLight0[4] = {0.75f, 0.75f, 0.75f, 1.0f};
-        float specLight0[4] = {0.75f, 0.75f, 0.75f, 1.0f};
+        float LightAmbient[]= { 0.4f, 0.4f, 0.4f, 1.0f };
+        float LightDiffuse[]= { 0.8f, 0.8f, 0.8f, 1.0f };
+        float LightSpecular[]= { 1.2f, 1.2f, 1.2f, 1.0f };
+        float LightPosition[]= { 1.0f, 1.0f, 1.0f, 1.0f };
+
 
         /////////////////////Eclairage/////////////////////////////////////
         float colorWhite[4]  = {1.0f,1.0f,1.0f,1.0f};
         float ambientColor[4] = {0.35f,0.35f,0.35f,1.0f};
-        //float colorEmission[4]  = {0.0f,0.0f,0.0f,1.0f};
+
+        glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
+
+        float global_ambient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+        glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+
         glEnable(GL_DEPTH_TEST);	// Active le test de profondeur
         glEnable(GL_LIGHTING);          // Active l'éclairage
         glEnable(GL_LIGHT0);            // Active light0
@@ -81,20 +88,24 @@ void OpenGLWidget::initializeGL()
             glLightfv( GL_LIGHT3, GL_DIFFUSE, colorWhite );
             glLightfv( GL_LIGHT3, GL_SPECULAR, colorWhite );
             glLightf(GL_LIGHT3,GL_LINEAR_ATTENUATION ,0.1f);
-        glDisable(GL_LIGHT3);
-
         glEnable(GL_LIGHT4);            // Active light3, qui va suivre le projectile lors du tir
             glLightfv( GL_LIGHT4, GL_AMBIENT, LightAmbient );
-            glLightfv( GL_LIGHT4, GL_DIFFUSE, difLight0 );
-            glLightfv(GL_LIGHT4, GL_SPECULAR, specLight0);
-        //glDisable(GL_LIGHT4);
+            glLightfv( GL_LIGHT4, GL_DIFFUSE, LightDiffuse );
+            glLightfv( GL_LIGHT4, GL_SPECULAR, LightSpecular);
+            glLightfv( GL_LIGHT4, GL_POSITION, LightPosition);
+
         /*config reflection lumière sur les matériaux*/
         int MatSpec [4] = {1,1,1,1};
         float ambient[4] = {0.55f,0.55f,0.55f,1.0f};
 
-        glMaterialiv(GL_FRONT_AND_BACK,GL_SPECULAR,MatSpec);
-        glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,ambient);
-        glMateriali(GL_FRONT_AND_BACK,GL_SHININESS,100);
+        float qaBlack[] = {0.0,0.0,0.0,1.0};
+        float qaGreen[] = {0.0,1.0,0.0,1.0};
+        float qaWhite[] = {1.0,1.0,1.0,1.0};
+
+        glMaterialfv(GL_FRONT,GL_AMBIENT,qaGreen);
+        glMaterialfv(GL_FRONT,GL_DIFFUSE,qaGreen);
+        glMaterialfv(GL_FRONT,GL_SPECULAR,qaWhite);
+        glMaterialf(GL_FRONT,GL_SHININESS,60.0);
         /*fin config lum*/
         ///////////////////////////////////////////////////////////////////
 
@@ -225,7 +236,6 @@ GLuint OpenGLWidget::loadTexture ( QString filename, bool useMipMap)
 /////////////////////////////////////////////////////////////////////////////////////
 
 
-
 /*REPERE*/
 void OpenGLWidget::dessinerRepere()
 {
@@ -273,7 +283,6 @@ void OpenGLWidget::dessinerRepere()
 }
 
 
-
 void OpenGLWidget::ConversionVecteursVersAngles() //transforme les coordonnÃ©es X,Y,Z en _phi et _theta
 {
         //Calcul des angles à  partir des coordonnees X,Y,Z :
@@ -285,16 +294,16 @@ void OpenGLWidget::ConversionVecteursVersAngles() //transforme les coordonnÃ©e
         //_theta = arcos ( X / racine(X²+Y²) )
         //-La librairie <cmath> utilise les radians! C'est pour cela qu'il faut convertir à chaque fois les degrÃ©s...
 
-        Coord3D _forward(_targetJoueur.X - (_positionJoueur.X+1),_targetJoueur.Y - (_positionJoueur.Y+1),_targetJoueur.Z - (_positionJoueur.Z+6));
+        QVector3D _forward(_targetJoueur.x() - (_positionJoueur.x()+1),_targetJoueur.y() - (_positionJoueur.y()+1),_targetJoueur.z() - (_positionJoueur.z()+6));
 
-        float r = sqrt(pow(_forward.X,2) + pow(_forward.Y,2) + pow(_forward.Z,2));
-        _phi = ( acos(_forward.Z/r)  *180/M_PI);
+        float r = sqrt(pow(_forward.x(),2) + pow(_forward.y(),2) + pow(_forward.z(),2));
+        _phi = ( acos(_forward.z()/r)  *180/M_PI);
 
-        float r_temp = sqrt(pow(_forward.X,2) + pow(_forward.Y,2));
-        if (_forward.Y >= 0)
-                _theta = ( (acos(_forward.X/r_temp)) *180/M_PI);
+        float r_temp = sqrt(pow(_forward.x(),2) + pow(_forward.y(),2));
+        if (_forward.y() >= 0)
+                _theta = ( (acos(_forward.x()/r_temp)) *180/M_PI);
         else
-                _theta = - (  (acos(_forward.X/r_temp))   *180/M_PI);
+                _theta = - (  (acos(_forward.x()/r_temp))   *180/M_PI);
 
 
 }
@@ -326,18 +335,18 @@ void OpenGLWidget::paintGL()
     _positionJoueur = (*p_joueur).getPosition();
     _targetJoueur = (*p_joueur).getCibleCamera();
 
-    _positionCamera.X = _positionJoueur.X +1;
-    _positionCamera.Y = _positionJoueur.Y +1;
-    _positionCamera.Z = _positionJoueur.Z +6;
+    _positionCamera.setX(_positionJoueur.x()+1);
+    _positionCamera.setY(_positionJoueur.y()+1);
+    _positionCamera.setZ(_positionJoueur.z()+6);
 
     _cibleCamera = _targetJoueur;
-    gluLookAt(_positionCamera.X,_positionCamera.Y,_positionCamera.Z,_cibleCamera.X,_cibleCamera.Y,_cibleCamera.Z,0,0,1);
+    gluLookAt(_positionCamera.x(),_positionCamera.y(),_positionCamera.z(),_cibleCamera.x(),_cibleCamera.y(),_cibleCamera.z(),0,0,1);
 
 
     ////////////////////////////////////
     /////Gestion des lumières///////////
     ////////////////////////////////////
-    int light0Pos[4] = {0, 10, 1, 1};
+    int light0Pos[4] = {1, 10, 1, 1};
     float spot1Pos[4] = {0.0f, 0.0f, 0.0f, 1.0f};
     float spot1Dir[3] = {0.0f, 0.0f, -1.0f};
     float spot2Pos[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -370,10 +379,6 @@ void OpenGLWidget::paintGL()
             gluDeleteQuadric(params2);
     glPopMatrix();
     a+=1; //l'angle de rotation de la lumière
-    glPushMatrix();
-        glLightfv( GL_LIGHT4, GL_SPOT_DIRECTION, spot1Dir );
-        glLightfv(GL_LIGHT4,GL_POSITION,spot1Pos);
-    glPopMatrix();
     // Et la LIGHT1 qui est un spot (dirigé vers la chaise)
     glPushMatrix();
         glTranslated(48,30,8);

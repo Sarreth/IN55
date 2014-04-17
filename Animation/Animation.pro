@@ -14,14 +14,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         MainWindow.cpp \
-    Coord3D.cpp \
     OpenGLWidget.cpp \
     CameraLibre.cpp \
     Objets.cpp \
     MD5Model.cpp
 
 HEADERS  += MainWindow.h \
-    Coord3D.h \
     OpenGLWidget.h \
     CameraLibre.h \
     Objets.h \

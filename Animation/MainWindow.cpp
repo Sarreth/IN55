@@ -21,23 +21,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     int nbParamDefinis = 0;
     QString nomObjet;
     bool isVisible = false;
-    Coord3D positionObjet;
+    QVector3D positionObjet;
 
     bool possedeCollisionBox = false;
-    Coord3D diagonaleCollisionBox;
+    QVector3D diagonaleCollisionBox;
     bool rotation90degCollisionBox = false;
-    Coord3D orientationObjet;
+    QVector3D orientationObjet;
     QString fichierMesh;
     QString fichierTexture;
     bool isTextureUVmap = false;
     float repeatTextX = 0.0;
     float repeatTextY = 0.0;
 
-    Coord3D cibleCamera;
+    QVector3D cibleCamera;
     float vitesseJoueur = 0;
     float sensivity = 0;
 
-    Coord3D positionCamera;
+    QVector3D positionCamera;
     QFile file("listeObjetsMap.txt");
     if (file.open(QIODevice::ReadOnly) == false)
         qDebug() << "----->ERREUR 01 ; Chargement du fichier map : FAILED";
@@ -71,32 +71,32 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             }
             if (mots[0]=="posX")
             {
-                positionObjet.X=mots[1].toFloat();
+                positionObjet.setX(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="posY")
             {
-                positionObjet.Y=mots[1].toFloat();
+                positionObjet.setY(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="posZ")
             {
-                positionObjet.Z=mots[1].toFloat();
+                positionObjet.setZ(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="orientationX")
             {
-                orientationObjet.X=mots[1].toFloat();
+                orientationObjet.setX(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="orientationY")
             {
-                orientationObjet.Y=mots[1].toFloat();
+                orientationObjet.setY(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="orientationZ")
             {
-                orientationObjet.Z=mots[1].toFloat();
+                orientationObjet.setZ(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="possedeCollisionBox")
@@ -106,17 +106,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
             }
             if (mots[0]=="diagCollisionBoxX")
             {
-                diagonaleCollisionBox.X=mots[1].toFloat();
+                diagonaleCollisionBox.setX(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="diagCollisionBoxY")
             {
-                diagonaleCollisionBox.Y=mots[1].toFloat();
+                diagonaleCollisionBox.setY(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="diagCollisionBoxZ")
             {
-                diagonaleCollisionBox.Z=mots[1].toFloat();
+                diagonaleCollisionBox.setZ(mots[1].toFloat());
                 nbParamDefinis++;
             }
             if (mots[0]=="rotation90degCollisionBox")
@@ -150,11 +150,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
                 nbParamDefinis++;
             }
             if (mots[0]=="cibleCameraX")
-                cibleCamera.X = mots[1].toFloat();
+                cibleCamera.setX(mots[1].toFloat());
             if (mots[0]=="cibleCameraY")
-                cibleCamera.Y = mots[1].toFloat();
+                cibleCamera.setY(mots[1].toFloat());
             if (mots[0]=="cibleCameraZ")
-                cibleCamera.Z = mots[1].toFloat();
+                cibleCamera.setZ(mots[1].toFloat());
             if (mots[0]=="vitesseJoueur")
                 vitesseJoueur = mots[1].toFloat();
             if (mots[0]=="sensivity")
@@ -182,7 +182,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     ////---Camera Principale--////
     //////////////////////////////
     positionCamera = joueur->getPosition();
-    positionCamera.Z+=5;//Pour mettre la camera à 5 au dessus du sol
+    positionCamera+=QVector3D(0,0,5);//Pour mettre la camera à 5 au dessus du sol
     cibleCamera = joueur->getCibleCamera();
     QDesktopWidget widget;
     mainScreenSize = widget.availableGeometry(widget.primaryScreen());
@@ -277,7 +277,7 @@ void MainWindow::wheelEvent ( QWheelEvent *event )
 
 void MainWindow::keyPressEvent ( QKeyEvent *event )
 {
-    Coord3D _posi(joueur->getPosition());
+    QVector3D _posi(joueur->getPosition());
 
     switch ( event->key() )
     {
@@ -317,7 +317,7 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
             joueur->deplacement ( SAUT, true );
             break;
         case Qt::Key_Shift:
-            qDebug() << "Pos = " << _posi.X << _posi.Y << _posi.Z;
+            qDebug() << "Pos = " << _posi.x() << _posi.y() << _posi.z();
             break;
     }
 }
@@ -342,5 +342,10 @@ void MainWindow::keyReleaseEvent ( QKeyEvent * event )
             qDebug() << "Debout";
             joueur->deplacement ( ACCROUPI, false );
             break;
+        case Qt::Key_Space:
+            //qDebug() << "Space";
+            joueur->deplacement ( SAUT, false );
+            break;
+
     }
 }
