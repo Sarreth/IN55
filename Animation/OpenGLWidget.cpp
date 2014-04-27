@@ -95,10 +95,6 @@ void OpenGLWidget::initializeGL()
             glLightfv( GL_LIGHT4, GL_POSITION, LightPosition);
 
         /*config reflection lumière sur les matériaux*/
-        int MatSpec [4] = {1,1,1,1};
-        float ambient[4] = {0.55f,0.55f,0.55f,1.0f};
-
-        float qaBlack[] = {0.0,0.0,0.0,1.0};
         float qaGreen[] = {0.0,1.0,0.0,1.0};
         float qaWhite[] = {1.0,1.0,1.0,1.0};
 
