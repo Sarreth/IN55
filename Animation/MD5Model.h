@@ -11,8 +11,8 @@ public:
 
     bool loadModel( const std::string& filename );
     void update( float fDeltaTime );
-    void render();
-
+    void render(int posx,int posy,int posz);
+    void getJointByName(const std::string& name);
     void computeQuatW(QQuaternion& quat);
     void removeQuotes(std::string& str );
     int getFileLength( std::istream& file );

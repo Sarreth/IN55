@@ -332,16 +332,16 @@ bool MD5Model::prepareNormals( Mesh& mesh )
     return true;
 }
 
-void MD5Model::render()
+void MD5Model::render(int posx, int posy, int posz)
 {
     glPushMatrix();
-    glTranslated ( 40,40,60 );
+    glTranslated ( posx, posy, posz );
     glMultMatrixf( m_LocalToWorldMatrix.data() );
 
     // Render the meshes
     for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
         renderMesh( m_Meshes[i] );
-
+    renderSkeleton(m_Joints);
     glPopMatrix();
 }
 
@@ -427,4 +427,21 @@ void MD5Model::renderSkeleton( const JointList& joints )
 
     glPopAttrib();
 
+}
+
+void MD5Model::getJointByName(const std::string& name)
+{
+    for ( unsigned int i = 0; i < m_Joints.size(); ++i )
+    {
+        Joint& j0 = m_Joints[i];
+        if ( j0.m_Name.compare(name)==0 )
+        {
+             qDebug()<< "name join " << j0.m_Name.c_str();
+             //Modif position
+             j0.m_Pos = QVector3D(5,5,5);
+
+        }
+
+
+    }
 }

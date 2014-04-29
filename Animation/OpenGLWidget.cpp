@@ -423,7 +423,7 @@ void OpenGLWidget::paintGL()
     // transparente soit caché par les opaque devant (c'est pour cette derniere raison qu'on ne desactive pas le DEPTH_TEST;
     int indexObjet = 0;
     vector< int > tableau(_nombreObjets,0);
-    g_model.render();
+    g_model.render(40,40,60);
 
     for (int i=0 ; i < _nombreObjets ; i++)
             p_listeObjets[i]->afficherObjet();

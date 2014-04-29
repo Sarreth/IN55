@@ -346,6 +346,9 @@ void MainWindow::keyReleaseEvent ( QKeyEvent * event )
             //qDebug() << "Space";
             joueur->deplacement ( SAUT, false );
             break;
+        case Qt::Key_M:
+            vuePrincipal->g_model.getJointByName("clavicle.R");
+        break;
 
     }
 }
