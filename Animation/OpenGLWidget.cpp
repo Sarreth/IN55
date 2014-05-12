@@ -19,10 +19,13 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLi
 
     setFixedSize ( largeur, hauteur );
     setFormat ( QGLFormat ( QGL::DoubleBuffer | QGL::DepthBuffer ) );
+
     loadSkybox();
 
     a=0;
     qDebug() << "+ Creation du GLwidget : " << _nomDeClasse << " : OK";
+
+
 
 }
 
@@ -44,14 +47,30 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, QVector3D pos
     setFormat ( QGLFormat ( QGL::DoubleBuffer | QGL::DepthBuffer ) );
 
     a=0;
-
     qDebug() << "+ Creation du GLwidget : " << _nomDeClasse << " : OK";
+
     loadSkybox();
 
 }
 
 void OpenGLWidget::initializeGL()
 {
+        Texture* sunDiffuse = Texture::newFromNextUnit();
+        Texture* sunAlpha = Texture::newFromNextUnit();
+
+        sunDiffuse->load("pics/sun_1k.jpg");
+        sunDiffuse->setFilters(Texture::MIPMAP, Texture::MIPMAP);
+        sunDiffuse->init();
+        sunAlpha->load("pics/sun_1k_alpha.jpg");
+        sunAlpha->setFilters(Texture::MIPMAP, Texture::MIPMAP);
+        sunAlpha->init();
+
+        Material* sunMat = new Material(sunDiffuse, sunAlpha);
+        sun = new Sun(sunMat);
+
+        qDebug() << "+ Creation du Sun : OK";
+
+        sun->initVBO();
 
         qglClearColor ( Qt::black );
         float LightAmbient[]= { 0.4f, 0.4f, 0.4f, 1.0f };
@@ -197,6 +216,13 @@ glEnd();
 glPopMatrix();
 }
 
+void OpenGLWidget::drawSun()
+{
+    __material = sun->getMaterial();
+    __shader = __material->bind();
+    sun->drawWithVBO();
+
+}
 GLuint OpenGLWidget::loadTexture ( QString filename, bool useMipMap)
 {
         QImage baseTexture, interTexture;
@@ -307,6 +333,8 @@ void OpenGLWidget::ConversionVecteursVersAngles() //transforme les coordonnÃ©e
 
 void OpenGLWidget::resizeGL ( int width, int height )
 {
+    if(sun != 0)
+        sun->getLight()->resize(1);
 
     glViewport ( 0, 0, width, height );
     glMatrixMode ( GL_PROJECTION );
@@ -321,6 +349,7 @@ void OpenGLWidget::resizeGL ( int width, int height )
 void OpenGLWidget::paintGL()
 {
 
+    drawSun();
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
@@ -394,7 +423,6 @@ void OpenGLWidget::paintGL()
     glEnable ( GL_TEXTURE_2D );
 
     drawSkybox();
-
     ////On dessine le sol
     glBindTexture ( GL_TEXTURE_2D, textureSol );
     glBegin ( GL_TRIANGLES );
@@ -424,6 +452,7 @@ void OpenGLWidget::paintGL()
     int indexObjet = 0;
     vector< int > tableau(_nombreObjets,0);
     g_model.render(40,40,60);
+    sun->update(p_joueur->getPosition(), QVector3D(sin(p_joueur->_theta),0,cos(p_joueur->_theta)));
 
     for (int i=0 ; i < _nombreObjets ; i++)
             p_listeObjets[i]->afficherObjet();
@@ -432,7 +461,6 @@ void OpenGLWidget::paintGL()
     for (int i=0 ; i < indexObjet ; i++)
         p_listeObjets[tableau[i]]->afficherObjet();
 
-    glDepthMask(GL_TRUE);
-
+    glDepthMask(GL_TRUE);    
 }
 

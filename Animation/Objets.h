@@ -35,6 +35,7 @@
 #include <QVector3D>
 #include <QQuaternion>
 #include <QMatrix4x4>
+#include <QHash>
 
 #include <QtOpenGL/QGLWidget>
 #include <GL/gl.h>

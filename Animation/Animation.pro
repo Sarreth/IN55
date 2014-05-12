@@ -17,10 +17,24 @@ SOURCES += main.cpp\
     OpenGLWidget.cpp \
     CameraLibre.cpp \
     Objets.cpp \
-    MD5Model.cpp
+    MD5Model.cpp \
+    Texture.cpp \
+    Sun.cpp \
+    Shader.cpp \
+    Material.cpp \
+    Object3D.cpp \
+    Geometry.cpp \
+    Light.cpp
 
 HEADERS  += MainWindow.h \
     OpenGLWidget.h \
     CameraLibre.h \
     Objets.h \
-    MD5Model.h
+    MD5Model.h \
+    Texture.h \
+    Sun.h \
+    Shader.h \
+    Material.h \
+    Object3D.h \
+    Geometry.h \
+    Light.h

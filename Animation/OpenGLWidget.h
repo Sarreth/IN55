@@ -1,7 +1,7 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include "MD5Model.h"
+#include "Sun.h"
 
 
 class OpenGLWidget : public QGLWidget
@@ -20,6 +20,7 @@ class OpenGLWidget : public QGLWidget
 
                 void loadSkybox();
                 void drawSkybox();
+                void drawSun();
                 GLuint cube_map_texture_ID[6];
                 QImage texture_image[6];
 
@@ -46,6 +47,10 @@ class OpenGLWidget : public QGLWidget
                 int _nombreDeTextures;
                 GLuint textureSol, textureJoueur;
                 QString _nomDeClasse;
+
+                Sun* sun;
+                Material* __material;
+                Shader* __shader;
 
                 int a; //angle de rotation de la sphere de lumière
 };

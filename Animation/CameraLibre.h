@@ -1,7 +1,7 @@
 #ifndef CAMERALIBRE_H
 #define CAMERALIBRE_H
 
-#include "Objets.h"
+#include "Light.h"
 
 class CameraLibre : public Objet
 {
@@ -17,8 +17,6 @@ class CameraLibre : public Objet
                 int getAngleRotationArme();
                 void setToucheArmeActive(bool statut);
                 bool getStatutTir();
-                QVector3D getCoordOrigineTir();
-                QVector3D getCoordVecteurTir();
 
                 void setVitesse(float speed);
                 float getVitesse();
