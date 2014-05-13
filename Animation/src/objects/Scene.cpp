@@ -10,7 +10,6 @@ Scene::Scene():Object3D()
     Texture::resetUnit();
     SkyBox* skyBox = new SkyBox(new MaterialSkyBox(new TextureCube("pics/skybox/")));
     skyBox->setPosition(QVector3D(0,0,0));
-    skyBox->updateMatrix();
 
     // SUN
     Texture::resetUnit();
@@ -70,8 +69,6 @@ void Scene::init()
 {
     foreach(Mesh* m, meshes)
         m->initVBO();
-
-    sky->setPosition(currentCamera->getPosition());
 
     sky->initVBO();
     sun->initVBO();

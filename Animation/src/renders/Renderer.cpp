@@ -66,7 +66,7 @@ void Renderer::stop()
 
 void Renderer::render()
 {
-    delta = timer.restart()/32;
+    delta = timer.restart()/26;
 
     scene->update(delta);
     __lightDir = __sun->getLight()->getDirection();
