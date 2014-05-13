@@ -1,7 +1,7 @@
 #ifndef CAMERALIBRE_H
 #define CAMERALIBRE_H
 
-#include "Light.h"
+#include "src/objects/Light.h"
 
 class CameraLibre : public Objet
 {

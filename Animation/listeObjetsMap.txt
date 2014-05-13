@@ -306,26 +306,4 @@ repeatTextX=0
 repeatTextY=0
 !FinObjet
 ##########################################
-##########################################
-!NouvelObjet
-nomObjet=Oceanian
-isVisible=1
-posX=30
-posY=32
-posZ=3
-orientationX=0
-orientationY=0
-orientationZ=0
-possedeCollisionBox=1
-diagCollisionBoxX=4
-diagCollisionBoxY=3
-diagCollisionBoxZ=2
-rotation90degCollisionBox=0
-fichierMesh=Meshs/oceanian.obj
-fichierTexture=pics/whisp.png
-isTextureUVmap=1
-repeatTextX=0
-repeatTextY=0
-#!FinObjet
-##########################################
 

@@ -2,6 +2,7 @@
 #define MD5MODEL_H
 
 #include "CameraLibre.h"
+#include <QMatrix4x4>
 
 class MD5Model
 {
