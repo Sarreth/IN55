@@ -24,6 +24,13 @@ MD5Model::MD5Model(const MD5Model& model)
 {
 }
 
+void MD5Model::resizeSkelton(float s)
+{
+    for(int i=0;i<m_iNumJoints;++i)
+        m_Joints[i].m_Pos *= s;
+
+}
+
 MD5Model::~MD5Model()
 {
 }
@@ -222,7 +229,6 @@ bool MD5Model::loadModel( const string &filename )
                         vert.m_Tex0.setX(tmpX);
                         vert.m_Tex0.setY(tmpY);
                         ignoreLine(file, fileLength);
-
                         mesh.m_Verts.push_back(vert);
                         mesh.m_Tex2DBuffer.push_back(vert.m_Tex0);
                     }
@@ -266,15 +272,16 @@ bool MD5Model::loadModel( const string &filename )
                 file >> param;
             }
 
+
             prepareMesh(mesh);
             prepareNormals(mesh);
 
             m_Meshes.push_back(mesh);
 
         }
-
         file >> param;
     }
+    resizeSkelton(1/4);
 
     return true;
 }

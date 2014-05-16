@@ -131,7 +131,7 @@ void OpenGLWidget::initializeGL()
         textureJoueur = loadTexture ( QString ( "pics/whisp.png" ), true);
 
         g_model.loadModel( "Meshs/girl3D.md5mesh" );
-
+//        g_model.resizeSkelton(1/4);
         /////////////////////////////////////////////////////////////////////
 
         for (int i=0 ; i < _nombreObjets ; i++)
