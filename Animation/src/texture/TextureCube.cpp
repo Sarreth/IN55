@@ -36,6 +36,8 @@ void TextureCube::init()
 
     glActiveTexture(glunit);
     glEnable(GL_TEXTURE_CUBE_MAP);
+    glDisable(GL_LIGHTING);
+
     glGenTextures(1, &gluid);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, gluid);

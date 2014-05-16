@@ -128,13 +128,26 @@ void Mesh::drawWithVBO()
 
 void Mesh::debugDrawWithVBO()
 {
+    glDisable(GL_LIGHTING);
     glEnableVertexAttribArray(locVertices);
     glBindBuffer(GL_ARRAY_BUFFER,vertices);
     glVertexAttribPointer(locVertices,3,GL_FLOAT,GL_FALSE,0,0);
 
-    glDrawArrays(GL_POINTS, 0, geometry->getIndicesCount());
+    glEnableVertexAttribArray(locNormals);
+    glBindBuffer(GL_ARRAY_BUFFER,normals);
+    glVertexAttribPointer(locNormals,3,GL_FLOAT,GL_FALSE,0,0);
+
+    glEnableVertexAttribArray(locTexCoords);
+    glBindBuffer(GL_ARRAY_BUFFER,texcoords);
+    glVertexAttribPointer(locTexCoords,2,GL_FLOAT,GL_FALSE,0,0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,indices);
+    glDrawElements(geometry->getPrimitive(), geometry->getIndicesCount(), GL_UNSIGNED_INT, 0);
 
     glDisableVertexAttribArray(locVertices);
+    glDisableVertexAttribArray(locNormals);
+    glDisableVertexAttribArray(locTexCoords);
+
 }
 
 Geometry* Mesh::getGeometry()

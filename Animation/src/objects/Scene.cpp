@@ -9,7 +9,7 @@ Scene::Scene():Object3D()
 
     Texture::resetUnit();
     SkyBox* skyBox = new SkyBox(new MaterialSkyBox(new TextureCube("pics/skybox/")));
-    skyBox->setPosition(QVector3D(0,0,0));
+    skyBox->setPosition(camera->getPosition());
 
     // SUN
     Texture::resetUnit();
@@ -77,6 +77,7 @@ void Scene::init()
 
 void Scene::update(float delta)
 {
+    qDebug() << "Sky pos : " << sky->getPosition() << "//Cam pos : " << currentCamera->getPosition() << endl;
     float groundY = ground->getYApprox(currentCamera->getPosition().x(), currentCamera->getPosition().z(),currentCamera->getPosition().y());
 
     currentCamera->setMouse(QCursor::pos().x(), QCursor::pos().y());
@@ -84,10 +85,10 @@ void Scene::update(float delta)
 
     float yaw = currentCamera->getYaw();
     cameraZ=QVector3D(std::sin(yaw),0,-std::cos(yaw));
-    QVector3D cameraPostion = currentCamera->getPosition();
+    QVector3D cameraPosition = currentCamera->getPosition();
 
-    sky->setPosition(cameraPostion);
-    sun->update(cameraPostion, cameraZ);
+    sky->setPosition(cameraPosition);
+    sun->update(cameraPosition, cameraZ);
 }
 
 QList<Mesh*> Scene::getMeshes()

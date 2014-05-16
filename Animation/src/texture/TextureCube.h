@@ -2,6 +2,7 @@
 #define TEXTURECUBE_H
 
 #include "Texture.h"
+#include <QImage>
 
 class TextureCube : QOpenGLFunctions_3_2_Core
 {

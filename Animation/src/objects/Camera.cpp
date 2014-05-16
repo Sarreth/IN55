@@ -14,7 +14,7 @@ Camera::Camera():Object3D()
     spaceKey = false;
     controlKey = false;
 
-    setPerspective(90.0f, 1.33, 0.1f, 500.0f);
+    setPerspective(45.0f, 1.33, 0.1f, 1.0f);
     target = QVector3D(0,0,0);
 
     lookSpeed = 0.5;
