@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 MD5Model::MD5Model()
 : m_iMD5Version(-1)
 , m_iNumJoints(0)
@@ -12,8 +13,39 @@ MD5Model::MD5Model()
 {
 }
 
+MD5Model::MD5Model(const MD5Model& model)
+: m_iMD5Version(model.m_iMD5Version)
+, m_iNumJoints(model.m_iNumJoints)
+, m_iNumMeshes(model.m_iNumMeshes)
+, m_bHasAnimation(model.m_bHasAnimation)
+, m_LocalToWorldMatrix(model.m_LocalToWorldMatrix)
+, m_Joints(model.m_Joints)
+, m_Meshes(model.m_Meshes)
+{
+}
+
 MD5Model::~MD5Model()
 {
+}
+
+MD5Model::MeshList MD5Model::getMeshList(){
+    return m_Meshes;
+}
+
+MD5Model::JointList MD5Model::getJointList(){
+    return m_Joints;
+}
+
+void MD5Model::setJointList(JointList& joints){
+    m_Joints = joints;
+}
+
+void MD5Model::update(){
+    for(unsigned int i=0; i < m_Meshes.size(); i++){
+        prepareMesh(m_Meshes[i],m_Joints);
+        //prepareMesh(m_Meshes[i]);
+        //prepareNormals(m_Meshes[i]);
+    }
 }
 
 GLuint MD5Model::loadTexture ( string filename, bool useMipMap)
@@ -282,6 +314,34 @@ bool MD5Model::prepareMesh( Mesh& mesh )
     return true;
 }
 
+bool MD5Model::prepareMesh( Mesh& mesh,JointList& jl )
+{
+    // Compute vertex positions
+    for ( unsigned int i = 0; i < mesh.m_Verts.size(); ++i )
+    {
+        const Vertex& vert = mesh.m_Verts[i];
+        QVector3D& pos = mesh.m_PositionBuffer[i];
+        QVector3D& normal = mesh.m_NormalBuffer[i];
+
+        pos = QVector3D(0,0,0);
+        normal = QVector3D(0,0,0);
+
+        // Sum the position of the weights
+        for ( int j = 0; j < vert.m_WeightCount; ++j )
+        {
+            const Weight& weight = mesh.m_Weights[vert.m_StartWeight + j];
+            const Joint& joint = jl[weight.m_JointID];
+
+            // Convert the weight position from Joint local space to object space
+            QVector3D rotPos = joint.m_Orient.rotatedVector(weight.m_Pos);
+            pos += ( joint.m_Pos + rotPos ) * weight.m_Bias;
+            normal += ( joint.m_Orient.vector() + vert.m_Normal ) * weight.m_Bias;
+        }
+    }
+
+    return true;
+}
+
 // Compute the vertex normals in the Mesh's bind pose
 bool MD5Model::prepareNormals( Mesh& mesh )
 {
@@ -332,6 +392,8 @@ bool MD5Model::prepareNormals( Mesh& mesh )
     return true;
 }
 
+
+
 void MD5Model::render(int posx, int posy, int posz)
 {
     glPushMatrix();
@@ -341,7 +403,7 @@ void MD5Model::render(int posx, int posy, int posz)
     // Render the meshes
     for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
         renderMesh( m_Meshes[i] );
-    renderSkeleton(m_Joints);
+    renderSkeleton(m_Joints,"hand.R");
     glPopMatrix();
 }
 
@@ -390,7 +452,7 @@ void MD5Model::renderNormals(  const Mesh& mesh )
     glPopAttrib();
 }
 
-void MD5Model::renderSkeleton( const JointList& joints )
+void MD5Model::renderSkeleton( const JointList& joints, string jointName )
 {
     glPointSize( 5.0f );
     glColor3f( 1.0f, 0.0f, 0.0f );
@@ -403,8 +465,15 @@ void MD5Model::renderSkeleton( const JointList& joints )
     // Draw the joint positions
     glBegin( GL_POINTS );
     {
-        for ( unsigned int i = 0; i < joints.size(); ++i )
+        for ( unsigned int i = 0; i < joints.size(); ++i ){
+            if(jointName == joints[i].m_Name){
+                glColor3f( 0.0f, 0.0f, 1.0f );
+            }
+            else{
+                glColor3f( 1.0f, 0.0f, 0.0f );
+            }
             glVertex3f( joints[i].m_Pos.x(),joints[i].m_Pos.y(),joints[i].m_Pos.z() );
+        }
     }
     glEnd();
 
@@ -444,4 +513,22 @@ void MD5Model::getJointByName(const std::string& name)
 
 
     }
+}
+
+int MD5Model::getIndexJointByName(const std::string& name)
+{
+    for ( unsigned int i = 0; i < m_Joints.size(); ++i )
+    {
+        Joint& j0 = m_Joints[i];
+        if ( j0.m_Name.compare(name)==0 )
+        {
+            return i;
+        }
+
+
+    }
+}
+
+void MD5Model::setJoint(Joint joint, int index){
+    m_Joints[index] = joint;
 }

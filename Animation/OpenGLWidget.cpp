@@ -4,6 +4,7 @@ using namespace std;
 
 OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLibre *joueur, QVector3D positionCamera, QVector3D targetCamera,  int tailleSolX, int tailleSolY, Objet *listeObjets[], int nombreObjets, QString nomDeClasse) : QGLWidget ( parent ) //le ": QGLWidget (parent) sert a appeler le constructeur de parent(obligatoire)
 {
+    resize(640,480);
     _nomDeClasse = nomDeClasse;
     p_joueur = joueur;
 
@@ -21,6 +22,7 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, int largeur, int hauteur, CameraLi
     setFormat ( QGLFormat ( QGL::DoubleBuffer | QGL::DepthBuffer ) );
     loadSkybox();
 
+    m_animation = NULL;
     a=0;
     qDebug() << "+ Creation du GLwidget : " << _nomDeClasse << " : OK";
 
@@ -44,10 +46,29 @@ OpenGLWidget::OpenGLWidget ( QWidget *parent, CameraLibre *joueur, QVector3D pos
     setFormat ( QGLFormat ( QGL::DoubleBuffer | QGL::DepthBuffer ) );
 
     a=0;
-
+    m_animation = NULL;
     qDebug() << "+ Creation du GLwidget : " << _nomDeClasse << " : OK";
     loadSkybox();
 
+}
+
+
+void OpenGLWidget::setAnimation(Animation *animation){
+    m_animation = animation;
+}
+
+Animation* OpenGLWidget::getAnimation(){
+    return m_animation;
+}
+
+void OpenGLWidget::playAnimation(){
+    bool endAnimation;
+    if(m_animation != NULL){
+        endAnimation = m_animation->runDeltaAnimation();
+        if(endAnimation){
+            m_animation = NULL;
+        }
+    }
 }
 
 void OpenGLWidget::initializeGL()
@@ -423,7 +444,24 @@ void OpenGLWidget::paintGL()
     // transparente soit caché par les opaque devant (c'est pour cette derniere raison qu'on ne desactive pas le DEPTH_TEST;
     int indexObjet = 0;
     vector< int > tableau(_nombreObjets,0);
-    g_model.render(40,40,60);
+
+
+    /*MD5Model::JointList jl2 = g_model.getJointList();
+    for(unsigned int j = 0; j<jl2.size();j++){
+        MD5Model::Joint joint = jl2[j];
+        if(joint.m_Name=="head"){
+
+            qDebug() << "JOINT " << qPrintable(QString::fromStdString(joint.m_Name)) << joint.m_ParentID << joint.m_Orient << joint.m_Pos;
+        }
+
+    }*/
+
+    //jouer l'animation si il y en a une
+    playAnimation();
+
+    //dessiner le model
+    g_model.render(40,60,30);
+
 
     for (int i=0 ; i < _nombreObjets ; i++)
             p_listeObjets[i]->afficherObjet();

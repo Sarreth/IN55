@@ -1,4 +1,7 @@
 #include "MainWindow.h"
+#include "Animation.h"
+#include "Ouioui.h"
+#include <QThread>
 
 #define AVANCER 0
 #define RECULER 1
@@ -11,13 +14,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     QApplication::setOverrideCursor( QCursor( Qt::BlankCursor ));
     this->setWindowTitle("IN55 Animation Project");
+    resize(640,480);
 
     enPause = false;
     rafraichirData = false;
 
     anti_repetition = false;
-    fullscreen = true;
-    mouseTracked = true;
 
     int nbParamParObjet = 0;
     int nbParamDefinis = 0;
@@ -238,11 +240,11 @@ void MainWindow::mouseMoveEvent ( QMouseEvent *event )
 {
     if ( anti_repetition == false )//on verifie que ce n'est pas la fonction qui se rappelle elle meme (avec setPos) et que la souris est sur le bon widget
     {
-        int xrel = (width()/2 - event->x());
-        int yrel = ( height()/2 - event->y());
+        int xrel = (mainScreenSize.width()/2 - event->x());
+        int yrel = ( mainScreenSize.height()/2 - event->y());
 
         joueur->mouvementSouris ( xrel, yrel );
-        QPoint pos(width()/2,height()/2);
+        QPoint pos(mainScreenSize.width()/2,mainScreenSize.height()/2);
 
         QCursor::setPos(mapToGlobal(pos));
 
@@ -318,9 +320,17 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
             //qDebug() << "Space";
             joueur->deplacement ( SAUT, true );
             break;
+        case Qt::Key_O:
+        {
+            qDebug() << "O";
+            if(vuePrincipal->getAnimation() == NULL){
+                vuePrincipal->setAnimation(new Ouioui(vuePrincipal->g_model));
+            }
+        }
+            break;
         case Qt::Key_Shift:
             qDebug() << "Pos = " << _posi.x() << _posi.y() << _posi.z();
-            break;            
+            break;
     }
 }
 
@@ -351,32 +361,6 @@ void MainWindow::keyReleaseEvent ( QKeyEvent * event )
         case Qt::Key_M:
             vuePrincipal->g_model.getJointByName("clavicle.R");
         break;
-        case Qt::Key_F1:
-            if(fullscreen)
-            {
-                setWindowState(Qt::WindowNoState);
-                fullscreen=false;
-                qDebug() << "+ Window mode";
-            }
-            else
-            {
-                setWindowState(Qt::WindowFullScreen);
-                fullscreen=true;
-                qDebug() << "+ Full screen";
-            }
-        break;
-        case Qt::Key_F2:
-                mouseTracked = !mouseTracked;
-                this->setMouseTracking(mouseTracked);
-                vuePrincipal->setMouseTracking(mouseTracked);
-                if(!mouseTracked)
-                    QApplication::setOverrideCursor( QCursor());
-                else
-                    QApplication::setOverrideCursor( QCursor( Qt::BlankCursor ));
-
-        break;
-
-
 
     }
 }

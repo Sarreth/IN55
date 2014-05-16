@@ -5,21 +5,9 @@
 
 class MD5Model
 {
+
 public:
-    MD5Model();
-    virtual ~MD5Model();
 
-    bool loadModel( const std::string& filename );
-    void update( float fDeltaTime );
-    void render(int posx,int posy,int posz);
-    void getJointByName(const std::string& name);
-    void computeQuatW(QQuaternion& quat);
-    void removeQuotes(std::string& str );
-    int getFileLength( std::istream& file );
-    void ignoreLine( std::istream& file, int length );
-    GLuint loadTexture(std::string file, bool mipmap);
-
-protected:
     typedef std::vector<QVector3D> PositionBuffer;
     typedef std::vector<QVector3D> NormalBuffer;
     typedef std::vector<QPoint> Tex2DBuffer;
@@ -55,8 +43,16 @@ protected:
         int             m_ParentID;
         QVector3D         m_Pos;
         QQuaternion     m_Orient;
+
+        Joint& operator=(const Joint& j){
+            m_Name = j.m_Name;
+            m_Orient = j.m_Orient;
+            m_ParentID = j.m_ParentID;
+            m_Pos = j.m_Pos;
+        }
     };
     typedef std::vector<Joint> JointList;
+
 
     struct Mesh
     {
@@ -77,20 +73,47 @@ protected:
     };
     typedef std::vector<Mesh> MeshList;
 
+
+    MD5Model();
+    MD5Model(const MD5Model& model);
+    virtual ~MD5Model();
+
+    bool loadModel( const std::string& filename );
+    void update( float fDeltaTime );
+    void update();
+    void render(int posx,int posy,int posz);
+    void getJointByName(const std::string& name);
+    int getIndexJointByName(const std::string& name);
+    void computeQuatW(QQuaternion& quat);
+    void removeQuotes(std::string& str );
+    int getFileLength( std::istream& file );
+    void ignoreLine( std::istream& file, int length );
+    GLuint loadTexture(std::string file, bool mipmap);
+    MeshList getMeshList();
+    JointList getJointList();
+    void setJointList(JointList& joints);
+    void setJoint(Joint joint, int index);
+
+
+
+protected:
+
     // Prepare the mesh for rendering
     // Compute vertex positions and normals
     bool prepareMesh( Mesh& mesh );
-//    bool PrepareMesh( Mesh& mesh, const MD5Animation::FrameSkeleton& skel );
-    bool prepareNormals( Mesh& mesh );
+    bool prepareMesh( Mesh& mesh,JointList& jl );
+    //  bool PrepareMesh( Mesh& mesh, const MD5Animation::FrameSkeleton& skel );
+    bool prepareNormals( Mesh& mesh);
 
     // Render a single mesh of the model
     void renderMesh( const Mesh& mesh );
-    void renderNormals( const Mesh& mesh );
+    void renderNormals(const Mesh& mesh);
 
     // Draw the skeleton of the mesh for debugging purposes.
-    void renderSkeleton( const JointList& joints );
+    void renderSkeleton(const JointList& joints , std::string jointName);
 
-//    bool CheckAnimation( const MD5Animation& animation ) const;
+    // bool CheckAnimation( const MD5Animation& animation ) const;
+
 private:
 
     int                 m_iMD5Version;

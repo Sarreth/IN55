@@ -39,9 +39,9 @@ public:
     QTimer *timerFPS;
 
     bool anti_repetition;
-    bool fullscreen;
-    bool mouseTracked;
     QPoint oldPosSouris;
+
+
 };
 
 #endif // MAINWINDOW_H

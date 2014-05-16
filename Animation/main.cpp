@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.showFullScreen();
+    //w.show();
     splash.finish(&w);
 
     return a.exec();

@@ -1,7 +1,8 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include "MD5Model.h"
+#include "Animation.h"
+//#include "MD5Model.h"
 
 
 class OpenGLWidget : public QGLWidget
@@ -15,6 +16,10 @@ class OpenGLWidget : public QGLWidget
                 void paintGL(); //appelle apres lors des updateGL (quand on veut rafraichir)
                 GLuint loadTexture ( QString filename, bool useMipMap); //chargement des textures
                 static void dessinerRepere();
+
+                void setAnimation(Animation* animation);
+                Animation *getAnimation();
+                void playAnimation();
 
                 void ConversionVecteursVersAngles();
 
@@ -48,6 +53,10 @@ class OpenGLWidget : public QGLWidget
                 QString _nomDeClasse;
 
                 int a; //angle de rotation de la sphere de lumière
+
+
+private:
+                Animation* m_animation;
 };
 
 
