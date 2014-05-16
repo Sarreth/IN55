@@ -18,8 +18,8 @@ void Ouioui::initPositions(){
 
     //position tête levée
     int indexHead = g_model.getIndexJointByName("head");
-    int indexNeck = g_model.getIndexJointByName("neck");
-    MD5Model::Joint newJointH = rotate( skelton[indexHead],  skelton[indexNeck],  QVector3D(1,0,0), 40);
+    //int indexNeck = g_model.getIndexJointByName("neck");
+    MD5Model::Joint newJointH = rotate( skelton[indexHead],  skelton[indexHead],  QVector3D(1,0,0), 25);
     skelton[indexHead] = newJointH;
 
     std::vector<int> tableIndex;
@@ -28,10 +28,12 @@ void Ouioui::initPositions(){
     int index;
     for(unsigned int j=0; j<tableIndex.size();j++){
        index =  tableIndex[j];
-       MD5Model::Joint newJoint = rotate( skelton[index],  skelton[indexNeck],  QVector3D(1,0,0), 40);
+       MD5Model::Joint newJoint = rotate( skelton[index],  skelton[indexHead],  QVector3D(1,0,0), 25);
        skelton[index] = newJoint;
     }
 
+    keyFrames.push_back(skelton);
+    keyFrames.push_back(skelton2);
     keyFrames.push_back(skelton);
     keyFrames.push_back(skelton2);
 

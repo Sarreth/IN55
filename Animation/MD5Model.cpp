@@ -24,11 +24,19 @@ MD5Model::MD5Model(const MD5Model& model)
 {
 }
 
-void MD5Model::resizeSkelton(float s)
+void MD5Model::resizeSkelton(int s)
 {
     for(int i=0;i<m_iNumJoints;++i)
-        m_Joints[i].m_Pos *= s;
-
+        m_Joints[i].m_Pos /= s;
+    for(int i=0;i<m_iNumMeshes;++i){
+       for(int j=0;j<m_Meshes[i].m_Verts.size();++j){
+           m_Meshes[i].m_Verts[j].m_Tex0 /= s;
+           m_Meshes[i].m_Tex2DBuffer[j] /=s;
+       }
+       for(int j=0;j<m_Meshes[i].m_Weights.size();++j){
+           m_Meshes[i].m_Weights[j].m_Pos /= s;
+       }
+    }
 }
 
 MD5Model::~MD5Model()
@@ -49,9 +57,9 @@ void MD5Model::setJointList(JointList& joints){
 
 void MD5Model::update(){
     for(unsigned int i=0; i < m_Meshes.size(); i++){
-        prepareMesh(m_Meshes[i],m_Joints);
-        //prepareMesh(m_Meshes[i]);
-        //prepareNormals(m_Meshes[i]);
+        //prepareMesh(m_Meshes[i],m_Joints);
+        prepareMesh(m_Meshes[i]);
+        prepareNormals(m_Meshes[i]);
     }
 }
 
@@ -273,16 +281,19 @@ bool MD5Model::loadModel( const string &filename )
             }
 
 
-            prepareMesh(mesh);
-            prepareNormals(mesh);
+            //prepareMesh(mesh);
+            //prepareNormals(mesh);
 
             m_Meshes.push_back(mesh);
 
         }
         file >> param;
-    }
-    resizeSkelton(1/4);
 
+
+    }
+
+    resizeSkelton(10);
+    update();
     return true;
 }
 

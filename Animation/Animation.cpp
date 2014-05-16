@@ -72,7 +72,7 @@ bool Animation::runDeltaAnimation(){
     //afficheSkelton(newSkelton);
     g_model.setJointList(newSkelton);
     updateModel();
-    m_progress = m_progress + 0.02;
+    m_progress = m_progress + 0.05;
     if(m_progress > 1){
         m_progress = 0;
         m_KeyFrameIndex = m_KeyFrameIndex +1;

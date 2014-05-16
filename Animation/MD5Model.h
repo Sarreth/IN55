@@ -93,7 +93,7 @@ public:
     JointList getJointList();
     void setJointList(JointList& joints);
     void setJoint(Joint joint, int index);
-    void resizeSkelton(float);
+    void resizeSkelton(int);
 
 
 

@@ -460,7 +460,7 @@ void OpenGLWidget::paintGL()
     playAnimation();
 
     //dessiner le model
-    g_model.render(40,60,30);
+    g_model.render(40,40,10);
 
 
     for (int i=0 ; i < _nombreObjets ; i++)
