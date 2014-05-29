@@ -292,7 +292,7 @@ bool MD5Model::loadModel( const string &filename )
 
     }
 
-    resizeSkelton(10);
+//    resizeSkelton(10);
     update();
     return true;
 }

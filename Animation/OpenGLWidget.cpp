@@ -130,7 +130,7 @@ void OpenGLWidget::initializeGL()
         textureSol = loadTexture ( QString ( "pics/floor.png" ), true);
         textureJoueur = loadTexture ( QString ( "pics/whisp.png" ), true);
 
-        g_model.loadModel( "Meshs/girl3D.md5mesh" );
+        g_model.loadModel( "Meshs/superman hero101.md5mesh" );
 //        g_model.resizeSkelton(1/4);
         /////////////////////////////////////////////////////////////////////
 
