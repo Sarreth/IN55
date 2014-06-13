@@ -1,6 +1,5 @@
 #include "MD5Model.h"
-
-
+#include <QtOpenGL>
 using namespace std;
 
 
@@ -83,7 +82,7 @@ GLuint MD5Model::loadTexture ( string filename, bool useMipMap)
         if ( useMipMap )
         {
                 gluBuild2DMipmaps ( GL_TEXTURE_2D, 3, interTexture.width(), interTexture.height(), GL_RGBA, GL_UNSIGNED_BYTE,
-                                    interTexture.bits() );//creation des 3 mipmaps (adapte a  chaque distance)
+                                    interTexture.bits());//creation des 3 mipmaps (adapte a  chaque distance)
 
                 glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR ); //ajout du filtre trilineaire pour le "tres beau rendu"
                 glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR ); //filtre lineaire pour longue distance

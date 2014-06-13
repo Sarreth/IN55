@@ -232,7 +232,7 @@ void MainWindow::stopperJeu()
 void MainWindow::cycleTimerJeu()
 {
     _numCycle++;
-    joueur->Animate(liste_objets, nombreObjets, _tailleTerrainX, _tailleTerrainY);
+    joueur->animate(liste_objets, nombreObjets, _tailleTerrainX, _tailleTerrainY);
 
     vuePrincipal->updateGL();
 }

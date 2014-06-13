@@ -22,16 +22,12 @@ CameraLibre::CameraLibre(bool isVisible, QVector3D position, QVector3D cibleCame
         Mouvement[SAUT] = false;
         Mouvement[ACCROUPI] = false;
 
-        joueurAccroupi = false;
-        saut.step = 0;//valeur de temps dans les equations horaires du mouvement, augmente de 25 a chaques etape pour finir a 1000, la fin du saut
-        saut.enCollision = false;
-
         _vitesse = vitesseJoueur; //pour la vitesse de deplacement
         _sensivity = sensivity;
 
         _phi = 0;
         _theta = 0;
-        ConversionVecteursVersAngles(); //calcul des angles phi et theta qui correspondent au _position et _targetCameraJoueur de dÃ©but de jeu
+        conversionVecteursVersAngles(); //calcul des angles phi et theta qui correspondent au _position et _targetCameraJoueur de dÃ©but de jeu
 
         _up=QVector3D(0,0,1);
 
@@ -39,7 +35,7 @@ CameraLibre::CameraLibre(bool isVisible, QVector3D position, QVector3D cibleCame
 
 
 
-void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerrainX, int tailleTerrainY)
+void CameraLibre::animate(Objet *listeObjet[], int nombreObjets, int tailleTerrainX, int tailleTerrainY)
 {
         int i=0; //pour les tests de collision
         if (_position.x() < 0) //pour ne pas sortir
@@ -126,72 +122,8 @@ void CameraLibre::Animate(Objet *listeObjet[], int nombreObjets, int tailleTerra
 
         if (Mouvement[SAUT])
             _position += QVector3D(0,0,1);
-        ////////////////////////////GESTION DU SAUT////////////////////////////
-/*
-        if ((Mouvement[SAUT]) || (saut.enCollision))
-        {
-            if ((Mouvement[SAUT]) && (saut.enCollision))
-            {
-                saut.step = 0;
-                saut.enCollision = false;
-            }
 
-            if (saut.step == 0)
-            {
-                saut.altitudeInitial = _position.Z;
-                saut.altitudeVoulu = _position.Z+7 ;
-                DeterminerConstanteSaut(saut.altitudeInitial, saut.altitudeVoulu);
-                saut.altitude = saut.altitudeInitial;
-            }
-            saut.altitudePrecedente = _position.Z;
-            saut.altitude = 0.5*saut.acceleration*(saut.step*saut.step) + saut.vitesseBase*saut.step+saut.altitudeInitial;
-            _position.Z = saut.altitude;
-
-            saut.step += 25;
-
-            //debut test collision
-            i=0;
-            _collision = false;
-            while (i<nombreObjets && !_collision)
-            {
-                if (listeObjet[i]->getPossedeCollisionBox()) //on verifie qu'il a une box
-                    _collision = test_Collision(_position, _collisionBox, listeObjet[i]->getPosition(), listeObjet[i]->getCollisionBox());
-                i++;
-            }
-            //Fin test collision
-
-            if ((_collision)&&(saut.step>500)) //quand on a saute sur un objet
-            {
-                //qDebug() << "step = " << saut.step << " | Altitude  = " << saut.altitude ;
-                _position.Z = saut.altitudePrecedente;
-                saut.enCollision = true;
-                Mouvement[SAUT] = false;
-                saut.step -= 25;
-
-            }
-            //et maintenant quand on tombe sans sauter de l'objet, on parametre un nouveau saut, mais juste la partie de la descente
-            else if ((!_collision)&&(saut.enCollision)&&(_position.Z>0))
-            {
-                saut.enCollision=false;
-                Mouvement[SAUT] = true;
-                saut.altitudeInitial = 0;
-                saut.altitudeVoulu = _position.Z;
-                DeterminerConstanteSaut(saut.altitudeInitial, saut.altitudeVoulu); //calcul vitesseInitiale et acceleration initiale
-                saut.altitude = saut.altitudeInitial;
-                saut.step=500; //la moitié du saut
-            }
-            else if (_position.Z<0) //et quand on touche le sol
-            {
-                _position.Z = 0;
-                Mouvement[SAUT] = false;
-                saut.enCollision = false;
-                saut.step = 0;
-            }
-        }
-*/
-        ////////////////////////////////////////////////////////////////////////
-
-        ConversionAnglesVersVecteurs(); //recalcule les coordonnees du vecteur de direction du regard a partir des angles _phi et _theta
+        conversionAnglesVersVecteurs(); //recalcule les coordonnees du vecteur de direction du regard a partir des angles _phi et _theta
         //comme on a bouge, on recalcule la cible fixee par la camera
         // en ajustant pour car la camera n'est pas exactement a la position du jour
         // mais decalé de (1,1,6)
@@ -214,13 +146,13 @@ bool CameraLibre::test_Collision(QVector3D positionObjet1, QVector3D boxObjet1, 
         return 1;
 }
 
-void CameraLibre::ConversionAnglesVersVecteurs() //tranforme les coordonnees_phi et _theta en vecteur qui donne la direction de la camera
+void CameraLibre::conversionAnglesVersVecteurs() //tranforme les coordonnees_phi et _theta en vecteur qui donne la direction de la camera
 {
         float r_temp = sin(_phi*M_PI/180);
         _forward = QVector3D(r_temp*cos(_theta*M_PI/180),r_temp*sin(_theta*M_PI/180),cos(_phi*M_PI/180));
 }
 
-void CameraLibre::ConversionVecteursVersAngles() //tranforme les coordonnees X,Y,Z en _phi et _theta
+void CameraLibre::conversionVecteursVersAngles() //tranforme les coordonnees X,Y,Z en _phi et _theta
 {
         //Calcul des angles à  partir des coordonnees X,Y,Z :
         //Une coordonnee spherique est de forme (r, _phi, _theta)
@@ -244,28 +176,6 @@ void CameraLibre::ConversionVecteursVersAngles() //tranforme les coordonnees X,Y
 
 }
 
-void CameraLibre::DeterminerConstanteSaut(float altitudeInitiale, float altitudeVoulu) //calcul l'acceleration et la vitesse (initiale) pour le saut
-{
-/*On a  z(t) = 0.5*acceleration² + saut.vitesseBase*t + z(0)
-On cherche l'acceleration et la vitessebase pour que z(t = 0) = z(0)
-                                                     z(t = 1000) = z(0)
-                                                     z(t = 500) = altitudeVoulu
-
-On obtient le systeme
----
-| 500 000*acceleration + 1000*vitesseBase + altitudeInitiale = altitudeInitiale
-| 125 000*acceleration + 500*vitesseBase + altitudeInitiale = altitudeVoulu
----
-et donc;
-acceleration = (-2*altitudeVoulu + 2*altitudeInitiale) / 250 000
-vitesseBase = (4*altitudeVoulu - 4*altitudeInitiale) /1000
-
-
-*/
-    saut.acceleration = (-2*altitudeVoulu + 2*altitudeInitiale) / 250000;
-    saut.vitesseBase = (4 * altitudeVoulu - 4*altitudeInitiale) / 1000;
-}
-
 void CameraLibre::mouvementSouris (int xrel, int yrel)
 {
         _theta += xrel*_sensivity; //on modifie les coordonnees polaire quand on bouge la souris
@@ -283,7 +193,7 @@ void CameraLibre::mouvementSouris (int xrel, int yrel)
             _theta = 180;
 
         _orientation.setZ(_theta);
-        ConversionAnglesVersVecteurs(); //et on convertit notre variation d'angle de vue en un vecteur (interpretable par la camera)
+        conversionAnglesVersVecteurs(); //et on convertit notre variation d'angle de vue en un vecteur (interpretable par la camera)
 }
 
 
