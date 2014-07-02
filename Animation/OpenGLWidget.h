@@ -1,8 +1,8 @@
 #ifndef OPENGLWIDGET_H
 #define OPENGLWIDGET_H
 
-#include "Animation.h"
-//#include "MD5Model.h"
+//#include "Animation.h"
+#include "MD5Model.h"
 
 
 class OpenGLWidget : public QGLWidget

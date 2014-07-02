@@ -1,7 +1,4 @@
 #include "MainWindow.h"
-#include "Animation.h"
-#include "Ouioui.h"
-#include "Walk.h"
 #include <QThread>
 
 #define AVANCER 0

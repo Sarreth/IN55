@@ -18,15 +18,12 @@ SOURCES += main.cpp\
     CameraLibre.cpp \
     Objets.cpp \
     MD5Model.cpp \
-    Animation.cpp \
-    Ouioui.cpp
+    MD5Animation.cpp
 
 HEADERS  += MainWindow.h \
     OpenGLWidget.h \
     CameraLibre.h \
     Objets.h \
     MD5Model.h \
-    Animation.h \
-    Ouioui.h
-
+    MD5Animation.h
 
