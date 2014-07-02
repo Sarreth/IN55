@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "Animation.h"
 #include "Ouioui.h"
+#include "Walk.h"
 #include <QThread>
 
 #define AVANCER 0
@@ -232,7 +233,7 @@ void MainWindow::stopperJeu()
 void MainWindow::cycleTimerJeu()
 {
     _numCycle++;
-    joueur->animate(liste_objets, nombreObjets, _tailleTerrainX, _tailleTerrainY);
+    joueur->Animate(liste_objets, nombreObjets, _tailleTerrainX, _tailleTerrainY);
 
     vuePrincipal->updateGL();
 }
@@ -283,6 +284,7 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
 {
     QVector3D _posi(joueur->getPosition());
 
+
     switch ( event->key() )
     {
         case Qt::Key_Escape:
@@ -320,12 +322,6 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
             //qDebug() << "Space";
             joueur->deplacement ( SAUT, true );
             break;
-        case Qt::Key_O:
-        {
-            if(vuePrincipal->getAnimation() == NULL)
-                vuePrincipal->setAnimation(new Ouioui(vuePrincipal->g_model));
-        }
-            break;
         case Qt::Key_Shift:
             qDebug() << "Pos = " << _posi.x() << _posi.y() << _posi.z();
             break;
@@ -342,7 +338,7 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
                 fullscreen=true;
                 qDebug() << "+ Full screen";
             }
-                break;
+            break;
         case Qt::Key_F2:
                 mouseTracked = !mouseTracked;
                 this->setMouseTracking(mouseTracked);
@@ -353,11 +349,65 @@ void MainWindow::keyPressEvent ( QKeyEvent *event )
                     QApplication::setOverrideCursor( QCursor( Qt::BlankCursor ));
             break;
 
+
+
+        case Qt::Key_N:
+        {
+            if(!event->isAutoRepeat()){
+                vuePrincipal->g_model.loadAnim("Meshs/boarman/boarman_walk.md5anim");
+                vuePrincipal->g_model.setIsWalking(true);
+                vuePrincipal->g_model.getAnimation().setContinuous(true);
+            }
+        }
+            break;
+        case Qt::Key_B:
+        {
+            if(!event->isAutoRepeat()){
+                vuePrincipal->g_model.loadAnim("Meshs/boarman/boarman_idle_long.md5anim");
+                vuePrincipal->g_model.getAnimation().setContinuous(false);
+            }
+        }
+            break;
+        case Qt::Key_V:
+        {
+            if(!event->isAutoRepeat()){
+                vuePrincipal->g_model.loadAnim("Meshs/boarman/boarman_pain.md5anim");
+                //vuePrincipal->g_model.getAnimation.setContinuous(false);
+            }
+        }
+            break;
+        case Qt::Key_C:
+        {
+            if(!event->isAutoRepeat()){
+                vuePrincipal->g_model.loadAnim("Meshs/boarman/boarman_defense.md5anim");
+                vuePrincipal->g_model.getAnimation().setContinuous(false);
+            }
+        }
+            break;
+        case Qt::Key_X:
+        {
+            if(!event->isAutoRepeat()){
+                vuePrincipal->g_model.loadAnim("Meshs/boarman/boarman_attack.md5anim");
+                vuePrincipal->g_model.getAnimation().setContinuous(false);
+            }
+        }
+            break;
+        case Qt::Key_W:
+        {
+            if(!event->isAutoRepeat()){
+                vuePrincipal->g_model.loadAnim("Meshs/boarman/boarman_death.md5anim");
+                vuePrincipal->g_model.getAnimation().setContinuous(false);
+            }
+        }
+            break;
+        break;
     }
 }
 
 void MainWindow::keyReleaseEvent ( QKeyEvent * event )
 {
+
+
     switch ( event->key() )
     {
         case Qt::Key_Z:
@@ -380,8 +430,15 @@ void MainWindow::keyReleaseEvent ( QKeyEvent * event )
             //qDebug() << "Space";
             joueur->deplacement ( SAUT, false );
             break;
-        case Qt::Key_M:
-            vuePrincipal->g_model.getJointByName("clavicle.R");
+        case Qt::Key_N:
+        {
+            if(!event->isAutoRepeat()){
+               vuePrincipal->g_model.clearAnimation();
+               vuePrincipal->g_model.setIsWalking(false);
+            }
+
+                break;
+        }
         break;
 
     }

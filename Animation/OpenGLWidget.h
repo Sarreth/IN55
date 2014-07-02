@@ -17,10 +17,6 @@ class OpenGLWidget : public QGLWidget
                 GLuint loadTexture ( QString filename, bool useMipMap); //chargement des textures
                 static void dessinerRepere();
 
-                void setAnimation(Animation* animation);
-                Animation *getAnimation();
-                void playAnimation();
-
                 void ConversionVecteursVersAngles();
 
                 void loadSkybox();
@@ -54,9 +50,6 @@ class OpenGLWidget : public QGLWidget
 
                 int a; //angle de rotation de la sphere de lumière
 
-
-private:
-                Animation* m_animation;
 };
 
 

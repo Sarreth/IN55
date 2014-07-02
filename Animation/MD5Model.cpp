@@ -1,5 +1,6 @@
 #include "MD5Model.h"
-#include <QtOpenGL>
+
+
 using namespace std;
 
 
@@ -9,6 +10,8 @@ MD5Model::MD5Model()
 , m_iNumMeshes(0)
 , m_bHasAnimation(false)
 , m_LocalToWorldMatrix()
+,m_isWalking(false)
+,m_Position(40,80,0)
 {
 }
 
@@ -20,8 +23,16 @@ MD5Model::MD5Model(const MD5Model& model)
 , m_LocalToWorldMatrix(model.m_LocalToWorldMatrix)
 , m_Joints(model.m_Joints)
 , m_Meshes(model.m_Meshes)
+,m_isWalking(false)
+,m_Position(40,80,0)
 {
 }
+
+
+void MD5Model::setPosition(QVector3D position){
+    m_Position = position;
+}
+
 
 void MD5Model::resizeSkelton(int s)
 {
@@ -42,16 +53,48 @@ MD5Model::~MD5Model()
 {
 }
 
-MD5Model::MeshList MD5Model::getMeshList(){
+MD5Model::MeshList MD5Model::getMeshList()
+{
     return m_Meshes;
 }
 
-MD5Model::JointList MD5Model::getJointList(){
+MD5Model::JointList MD5Model::getJointList()
+{
     return m_Joints;
 }
 
-void MD5Model::setJointList(JointList& joints){
+void MD5Model::setJointList(JointList& joints)
+{
     m_Joints = joints;
+}
+
+void MD5Model::translation(double coeff)
+{
+    m_Position.setY( m_Position.y() - coeff);
+}
+
+void MD5Model::setIsWalking(bool b)
+{
+    m_isWalking = b;
+}
+
+void MD5Model::update( float fDeltaTime )
+{
+    if ( m_bHasAnimation )
+    {
+        qDebug() << "md5model update hasanim";
+        m_Animation.update(fDeltaTime);
+        if(m_isWalking)
+        {
+            translation(0.1);
+        }
+        const MD5Animation::FrameSkeleton& skeleton = m_Animation.GetSkeleton();
+
+        for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
+        {
+            prepareMesh( m_Meshes[i], skeleton );
+        }
+    }
 }
 
 void MD5Model::update(){
@@ -62,12 +105,22 @@ void MD5Model::update(){
     }
 }
 
+void MD5Model::afficheSkelton(MD5Model::JointList& jl){
+        for(unsigned int j = 0; j<jl.size();j++)
+        {
+            MD5Model::Joint joint = jl[j];
+            //if(joint.m_Name=="origin")
+            qDebug() << "JOINT " << qPrintable(QString::fromStdString(joint.m_Name)) << joint.m_ParentID << joint.m_Orient << joint.m_Pos;
+
+        }
+}
+
 GLuint MD5Model::loadTexture ( string filename, bool useMipMap)
 {
         QImage baseTexture, interTexture;
         GLuint finalTexture;
 
-        if (!baseTexture.load ( QString::fromStdString(filename), "PNG" ))
+        if (!baseTexture.load ( QString::fromStdString(filename), "TGA" ))
         {
             qDebug() << "----->ERREUR 02 ; Chargement texture" << QString::fromStdString(filename) << "= FAILED";
             return 0;
@@ -82,7 +135,7 @@ GLuint MD5Model::loadTexture ( string filename, bool useMipMap)
         if ( useMipMap )
         {
                 gluBuild2DMipmaps ( GL_TEXTURE_2D, 3, interTexture.width(), interTexture.height(), GL_RGBA, GL_UNSIGNED_BYTE,
-                                    interTexture.bits());//creation des 3 mipmaps (adapte a  chaque distance)
+                                    interTexture.bits() );//creation des 3 mipmaps (adapte a  chaque distance)
 
                 glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR ); //ajout du filtre trilineaire pour le "tres beau rendu"
                 glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR ); //filtre lineaire pour longue distance
@@ -92,10 +145,12 @@ GLuint MD5Model::loadTexture ( string filename, bool useMipMap)
                 glTexParameteri ( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR ); //ajout seulement d'un filtre lineaire
                 glTexImage2D ( GL_TEXTURE_2D, 0, 3, interTexture.width(), interTexture.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, interTexture.bits() );
         }
-
+        qDebug() << "-----> Chargement texture taille" << interTexture.width() << interTexture.height() <<  interTexture.bits();
         return finalTexture; //on renvoie la texture
 
 }
+
+
 
 
 void MD5Model::computeQuatW(QQuaternion &quat)
@@ -210,6 +265,7 @@ bool MD5Model::loadModel( const string &filename )
                 if ( param == "shader" )
                 {
                     file >> mesh.m_Shader;
+                    qDebug() << "texturePath" << qPrintable(QString::fromStdString( mesh.m_Shader));
                     removeQuotes( mesh.m_Shader );
 
                     string shaderPath(mesh.m_Shader);
@@ -219,6 +275,11 @@ bool MD5Model::loadModel( const string &filename )
                     else
                         texturePath = parent_path + "/" + shaderPath;
 
+
+                    //mesh.m_TexID = SOIL_load_OGL_texture( texturePath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS );
+
+
+                    qDebug() << "texturePath" << qPrintable(QString::fromStdString(texturePath));
                     mesh.m_TexID = loadTexture( texturePath.c_str(), false );
                     ignoreLine(file,fileLength); // Ignore everything else on the line
                 }
@@ -233,8 +294,9 @@ bool MD5Model::loadModel( const string &filename )
                         file >> junk >> junk >> junk                    // vert vertIndex (
                             >> tmpX >> tmpY >> junk  //  s t )
                             >> vert.m_StartWeight >> vert.m_WeightCount;
-                        vert.m_Tex0.setX(tmpX);
-                        vert.m_Tex0.setY(tmpY);
+                        vert.m_Tex0.setX(tmpX*512);
+                        vert.m_Tex0.setY(tmpY*512);
+                        qDebug() << "txel" << tmpX << tmpY;
                         ignoreLine(file, fileLength);
                         mesh.m_Verts.push_back(vert);
                         mesh.m_Tex2DBuffer.push_back(vert.m_Tex0);
@@ -291,10 +353,58 @@ bool MD5Model::loadModel( const string &filename )
 
     }
 
-//    resizeSkelton(10);
+    //resizeSkelton(10);
     update();
     return true;
 }
+
+
+void MD5Model::clearAnimation(){
+    m_Animation.clearAnimation();
+    m_bHasAnimation = false;
+}
+
+MD5Animation &MD5Model::getAnimation()
+{
+    return m_Animation;
+}
+
+
+bool MD5Model::CheckAnimation( const MD5Animation& animation ) const
+{
+    if ( m_iNumJoints != animation.GetNumJoints() )
+    {
+        return false;
+    }
+
+    // Check to make sure the joints match up
+    for ( unsigned int i = 0; i < m_Joints.size(); ++i )
+    {
+        const Joint& meshJoint = m_Joints[i];
+        const MD5Animation::JointInfo& animJoint = animation.GetJointInfo( i );
+
+        if ( meshJoint.m_Name != animJoint.m_Name ||
+             meshJoint.m_ParentID != animJoint.m_ParentID )
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+bool MD5Model::loadAnim( const std::string& filename ){
+    if ( m_Animation.loadAnimation( filename ) )
+        {
+            // Check to make sure the animation is appropriate for this model
+            m_bHasAnimation = CheckAnimation( m_Animation );
+            qDebug() << "animAAAAA";
+        }
+
+        return m_bHasAnimation;
+}
+
 
 // Compute the position of the vertices in object local space
 // in the skeleton's bind pose
@@ -331,9 +441,8 @@ bool MD5Model::prepareMesh( Mesh& mesh )
     return true;
 }
 
-bool MD5Model::prepareMesh( Mesh& mesh,JointList& jl )
+bool MD5Model::prepareMesh( Mesh& mesh, const MD5Animation::FrameSkeleton& skel )
 {
-    // Compute vertex positions
     for ( unsigned int i = 0; i < mesh.m_Verts.size(); ++i )
     {
         const Vertex& vert = mesh.m_Verts[i];
@@ -343,19 +452,18 @@ bool MD5Model::prepareMesh( Mesh& mesh,JointList& jl )
         pos = QVector3D(0,0,0);
         normal = QVector3D(0,0,0);
 
-        // Sum the position of the weights
         for ( int j = 0; j < vert.m_WeightCount; ++j )
         {
             const Weight& weight = mesh.m_Weights[vert.m_StartWeight + j];
-            const Joint& joint = jl[weight.m_JointID];
+            const MD5Animation::SkeletonJoint& joint = skel.m_Joints[weight.m_JointID];
 
-            // Convert the weight position from Joint local space to object space
-            QVector3D rotPos = joint.m_Orient.rotatedVector(weight.m_Pos);
+            QVector3D rotPos = joint.m_Orient.rotatedVector(weight.m_Pos);;
             pos += ( joint.m_Pos + rotPos ) * weight.m_Bias;
-            normal += ( joint.m_Orient.vector() + vert.m_Normal ) * weight.m_Bias;
+
+            QVector3D tmp = QVector3D(vert.m_Normal.x()*joint.m_Orient.x(),vert.m_Normal.y()*joint.m_Orient.y(),vert.m_Normal.z()*joint.m_Orient.z());
+            normal += tmp * weight.m_Bias;
         }
     }
-
     return true;
 }
 
@@ -401,7 +509,7 @@ bool MD5Model::prepareNormals( Mesh& mesh )
         {
             const Weight& weight = mesh.m_Weights[vert.m_StartWeight + j];
             const Joint& joint = m_Joints[weight.m_JointID];
-            QVector3D tmp=QVector3D(normal.x()*joint.m_Orient.x(),normal.y()*joint.m_Orient.y(),normal.z()*joint.m_Orient.z());
+            QVector3D tmp = QVector3D(normal.x()*joint.m_Orient.x(),normal.y()*joint.m_Orient.y(),normal.z()*joint.m_Orient.z());
             vert.m_Normal += tmp * weight.m_Bias;
         }
     }
@@ -411,16 +519,18 @@ bool MD5Model::prepareNormals( Mesh& mesh )
 
 
 
-void MD5Model::render(int posx, int posy, int posz)
+void MD5Model::render()
 {
     glPushMatrix();
-    glTranslated ( posx, posy, posz );
+    glTranslated ( m_Position.x(), m_Position.y(), m_Position.z());
     glMultMatrixf( m_LocalToWorldMatrix.data() );
 
     // Render the meshes
     for ( unsigned int i = 0; i < m_Meshes.size(); ++i )
         renderMesh( m_Meshes[i] );
-    renderSkeleton(m_Joints,"hand.R");
+
+    m_Animation.render();
+    //renderSkeleton(m_Joints,"toe.R");
     glPopMatrix();
 }
 
@@ -471,7 +581,7 @@ void MD5Model::renderNormals(  const Mesh& mesh )
 
 void MD5Model::renderSkeleton( const JointList& joints, string jointName )
 {
-    glPointSize( 5.0f );
+    glPointSize( 15.0f );
     glColor3f( 1.0f, 0.0f, 0.0f );
 
     glPushAttrib( GL_ENABLE_BIT );
@@ -515,22 +625,6 @@ void MD5Model::renderSkeleton( const JointList& joints, string jointName )
 
 }
 
-void MD5Model::getJointByName(const std::string& name)
-{
-    for ( unsigned int i = 0; i < m_Joints.size(); ++i )
-    {
-        Joint& j0 = m_Joints[i];
-        if ( j0.m_Name.compare(name)==0 )
-        {
-             qDebug()<< "name join " << j0.m_Name.c_str();
-             //Modif position
-             j0.m_Pos = QVector3D(5,5,5);
-
-        }
-
-
-    }
-}
 
 int MD5Model::getIndexJointByName(const std::string& name)
 {
@@ -545,6 +639,7 @@ int MD5Model::getIndexJointByName(const std::string& name)
 
     }
 }
+
 
 void MD5Model::setJoint(Joint joint, int index){
     m_Joints[index] = joint;

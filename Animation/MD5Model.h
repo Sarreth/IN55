@@ -3,6 +3,8 @@
 
 #include "CameraLibre.h"
 
+#include "MD5Animation.h"
+
 class MD5Model
 {
 
@@ -79,10 +81,12 @@ public:
     virtual ~MD5Model();
 
     bool loadModel( const std::string& filename );
+    bool loadAnim( const std::string& filename );
+    void clearAnimation();
     void update( float fDeltaTime );
+    void render();
+
     void update();
-    void render(int posx,int posy,int posz);
-    void getJointByName(const std::string& name);
     int getIndexJointByName(const std::string& name);
     void computeQuatW(QQuaternion& quat);
     void removeQuotes(std::string& str );
@@ -94,6 +98,12 @@ public:
     void setJointList(JointList& joints);
     void setJoint(Joint joint, int index);
     void resizeSkelton(int);
+    JointList getRestPosition();
+    void setIsWalking(bool b);
+    void setPosition( QVector3D position);
+    void translation( double coeff);
+    MD5Animation& getAnimation();
+
 
 
 
@@ -102,7 +112,7 @@ protected:
     // Prepare the mesh for rendering
     // Compute vertex positions and normals
     bool prepareMesh( Mesh& mesh );
-    bool prepareMesh( Mesh& mesh,JointList& jl );
+    bool prepareMesh( Mesh& mesh, const MD5Animation::FrameSkeleton& skel );
     //  bool PrepareMesh( Mesh& mesh, const MD5Animation::FrameSkeleton& skel );
     bool prepareNormals( Mesh& mesh);
 
@@ -113,22 +123,23 @@ protected:
     // Draw the skeleton of the mesh for debugging purposes.
     void renderSkeleton(const JointList& joints , std::string jointName);
 
-    // bool CheckAnimation( const MD5Animation& animation ) const;
+     bool CheckAnimation( const MD5Animation& animation ) const;
+     void afficheSkelton(MD5Model::JointList& jl);
+
+
 
 private:
 
     int                 m_iMD5Version;
     int                 m_iNumJoints;
     int                 m_iNumMeshes;
-
     bool                m_bHasAnimation;
-
+    bool                m_isWalking;
     JointList           m_Joints;
     MeshList            m_Meshes;
-
-//    MD5Animation        m_Animation;
-
+    MD5Animation        m_Animation;
     QMatrix4x4          m_LocalToWorldMatrix;
+    QVector3D           m_Position;
 };
 
 #endif // MD5MODEL_H
